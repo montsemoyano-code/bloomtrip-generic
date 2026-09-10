@@ -75,6 +75,7 @@ const SUPABASE_KEY="sb_publishable_eukhXd1rFXuuRBrkfmAVmA_HujBVLOG";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 let people=[],trips=[],items=[],categories=[],locations=[],tripTypes=[],currentTrip=null,currentPerson=null,undoStack=[];
+let itemFilter={search:"",cat:"",priority:"",status:""};
 
 async function api(path,opts={}){
  const r=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...opts,headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json",Prefer:opts.method==="POST"?"return=representation":"return=minimal",...(opts.headers||{})}});
@@ -133,7 +134,7 @@ async function tripForm(t=null){
 await api("bloomtrip_trip_type_links?trip_id=eq."+id,{method:"DELETE"});const ids=[...document.querySelectorAll("[data-trip-type]:checked")].map(c=>Number(c.value));if(ids.length)await api("bloomtrip_trip_type_links",{method:"POST",body:JSON.stringify(ids.map(trip_type_id=>({trip_id:id,trip_type_id})))});closeModal();await renderTrips()}catch(e){alert("No se pudo guardar el viaje.\\n"+e.message)}}
 }
 async function deleteTrip(t){if(!confirm('¿Eliminar el viaje "'+t.name+'"?'))return;try{await api("bloomtrip_trip_items?trip_id=eq."+t.id,{method:"DELETE"});await api("bloomtrip_trips?id=eq."+t.id,{method:"DELETE"});await renderTrips()}catch(e){alert("No se pudo eliminar el viaje.")}}
-async function openPerson(p){currentPerson=p;$("profiles").classList.add("hidden");$("personDetail").classList.remove("hidden");$("personTitle").textContent=(p.emoji||"👤")+" "+p.name;undoStack=[];await renderItems()}
+async function openPerson(p){currentPerson=p;itemFilter={search:"",cat:"",priority:"",status:""};$("profiles").classList.add("hidden");$("personDetail").classList.remove("hidden");$("personTitle").textContent=(p.emoji||"👤")+" "+p.name;undoStack=[];await renderItems()}
 async function renderItemsLegacy(){
  items=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);
  const links=await api("bloomtrip_trip_item_people?select=*&person_id=eq."+currentPerson.id);
@@ -198,7 +199,10 @@ function peopleForm(){
 }
 function personForm(p=null){openModal('<h2>'+(p?"Editar perfil":"Nuevo perfil")+'</h2><div class="formgrid"><div class="field"><label>Nombre *</label><input id="pName" value="'+esc(p?.name||"")+'"></div><div class="field"><label>Tipo</label><select id="pKind"><option value="traveler" '+(p?.kind!=="pet"?"selected":"")+'>Viajero</option><option value="pet" '+(p?.kind==="pet"?"selected":"")+'>Mascota</option></select></div><div class="field"><label>Emoji</label><input id="pEmoji" value="'+esc(p?.emoji||"👤")+'"></div></div><div class="toolbar"><button id="cancel">Cancelar</button><button id="save" class="primary">Guardar</button></div>');$("cancel").onclick=closeModal;$("save").onclick=async()=>{try{const body={name:$("pName").value.trim(),kind:$("pKind").value,emoji:$("pEmoji").value.trim()||"👤",updated_at:new Date().toISOString()};if(!body.name)throw Error("El nombre es obligatorio.");if(p)await api("bloomtrip_people?id=eq."+p.id,{method:"PATCH",body:JSON.stringify(body)});else await api("bloomtrip_people",{method:"POST",body:JSON.stringify(body)});closeModal();await loadBase()}catch(e){alert("No se pudo guardar.")}}
 }
-$("newTripBtn").onclick=()=>tripForm();$("generalBtn").onclick=openGeneral;$("generalBack").onclick=()=>{$("general").classList.add("hidden");$("home").classList.remove("hidden");renderTrips()};$("generalAdd").onclick=generalForm;$("generalSearch").addEventListener("input",renderGeneral);$("generalCat").addEventListener("change",renderGeneral);$("managePeopleBtn").onclick=peopleForm;$("backBtn").onclick=()=>{$("detail").classList.add("hidden");$("home").classList.remove("hidden");currentTrip=null;currentPerson=null;renderTrips()};$("backPeopleBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden")};$("bottomBackBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};$("editTripBtn").onclick=()=>tripForm(currentTrip);$("addItemBtn").onclick=()=>itemForm();["search","cat","priority","status"].forEach(id=>$(id).addEventListener("input",renderItems));
+$("newTripBtn").onclick=()=>tripForm();$("generalBtn").onclick=openGeneral;$("generalBack").onclick=()=>{$("general").classList.add("hidden");$("home").classList.remove("hidden");renderTrips()};$("generalAdd").onclick=generalForm;$("generalSearch").addEventListener("input",renderGeneral);$("generalCat").addEventListener("change",renderGeneral);$("managePeopleBtn").onclick=peopleForm;$("backBtn").onclick=()=>{$("detail").classList.add("hidden");$("home").classList.remove("hidden");currentTrip=null;currentPerson=null;renderTrips()};$("backPeopleBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden")};$("bottomBackBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};$("editTripBtn").onclick=()=>tripForm(currentTrip);$("addItemBtn").onclick=()=>itemForm();$("search").addEventListener("input",e=>{itemFilter.search=e.target.value;renderItems()});
+$("cat").addEventListener("change",e=>{itemFilter.cat=e.target.value;renderItems()});
+$("priority").addEventListener("change",e=>{itemFilter.priority=e.target.value;renderItems()});
+$("status").addEventListener("change",e=>{itemFilter.status=e.target.value;renderItems()});
 renderTrips().catch(e=>alert("No se pudo conectar con BloomTrip.\\n"+e.message));
 </script>
 
@@ -310,28 +314,23 @@ async function renderItems(){
   const t=relevant.length,d=relevant.filter(x=>x.personDone).length,pc=t?Math.round(d/t*100):0;
   $("total").textContent=t;$("done").textContent=d;$("pending").textContent=t-d;$("pct").textContent=pc+"%";$("bar").style.width=pc+"%";
 
-  // Preserve filter values before rebuilding the selects.
-  const selectedCat=$("cat").value||"";
-  const selectedPri=$("priority").value||"";
-  const selectedStatus=$("status").value||"";
+  // Populate filter options without letting a render reset the user's selection.
   const norm=v=>String(v??"").trim();
   const cats=[...new Set(relevant.map(x=>norm(x.categoria)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const pris=[...new Set(relevant.map(x=>norm(x.prioridad)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const catEl=$("cat"), priEl=$("priority"), stEl=$("status");
+  const oldCat=itemFilter.cat, oldPri=itemFilter.priority;
+  catEl.innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+  priEl.innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+  catEl.value=cats.includes(oldCat)?oldCat:"";
+  priEl.value=pris.includes(oldPri)?oldPri:"";
+  stEl.value=itemFilter.status||"";
 
-  $("cat").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
-  $("priority").innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
-  if(cats.includes(selectedCat)) $("cat").value=selectedCat; else $("cat").value="";
-  if(pris.includes(selectedPri)) $("priority").value=selectedPri; else $("priority").value="";
-  $("status").value=selectedStatus;
-
-  const q=($("search").value||"").toLowerCase().trim();
-  const c=$("cat").value;
-  const pr=$("priority").value;
-  const st=$("status").value;
+  const q=norm(itemFilter.search).toLowerCase(), c=norm(itemFilter.cat), pr=norm(itemFilter.priority), st=itemFilter.status;
   const shown=relevant.filter(x=>{
     const text=((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase();
-    const categoryOk=!c||norm(x.categoria)===norm(c);
-    const priorityOk=!pr||norm(x.prioridad)===norm(pr);
+    const categoryOk=!c||norm(x.categoria)===c;
+    const priorityOk=!pr||norm(x.prioridad)===pr;
     const statusOk=!st||(st==="done")===x.personDone;
     return (!q||text.includes(q))&&categoryOk&&priorityOk&&statusOk;
   }).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
