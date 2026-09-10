@@ -134,7 +134,7 @@ await api("bloomtrip_trip_type_links?trip_id=eq."+id,{method:"DELETE"});const id
 }
 async function deleteTrip(t){if(!confirm('¿Eliminar el viaje "'+t.name+'"?'))return;try{await api("bloomtrip_trip_items?trip_id=eq."+t.id,{method:"DELETE"});await api("bloomtrip_trips?id=eq."+t.id,{method:"DELETE"});await renderTrips()}catch(e){alert("No se pudo eliminar el viaje.")}}
 async function openPerson(p){currentPerson=p;$("profiles").classList.add("hidden");$("personDetail").classList.remove("hidden");$("personTitle").textContent=(p.emoji||"👤")+" "+p.name;undoStack=[];await renderItems()}
-async function renderItems(){
+async function renderItemsLegacy(){
  items=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);
  const links=await api("bloomtrip_trip_item_people?select=*&person_id=eq."+currentPerson.id);
  const linkMap=new Map(links.map(x=>[x.trip_item_id,x]));
@@ -306,26 +306,36 @@ async function renderItems(){
   const links=await api("bloomtrip_trip_item_people?select=*&person_id=eq."+currentPerson.id);
   const linkMap=new Map(links.map(x=>[x.trip_item_id,x]));
   const relevant=items.filter(x=>x.assignment_mode==="all"||linkMap.has(x.id)).map(x=>({...x,personDone:x.assignment_mode==="all"?!!x.done:!!linkMap.get(x.id)?.done}));
+
   const t=relevant.length,d=relevant.filter(x=>x.personDone).length,pc=t?Math.round(d/t*100):0;
   $("total").textContent=t;$("done").textContent=d;$("pending").textContent=t-d;$("pct").textContent=pc+"%";$("bar").style.width=pc+"%";
 
-  /* Guardamos los filtros ANTES de reconstruir los <select>, porque al hacer innerHTML
-     el navegador perdía la selección y por eso se veía "Documentación" pero salían
-     artículos de "Ropa". */
+  // Preserve filter values before rebuilding the selects.
   const selectedCat=$("cat").value||"";
   const selectedPri=$("priority").value||"";
   const selectedStatus=$("status").value||"";
-  const cats=[...new Set(relevant.map(x=>x.categoria).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
-  const pris=[...new Set(relevant.map(x=>x.prioridad).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
-  $("cat").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'" '+(x===selectedCat?'selected':'')+'>'+esc(x)+'</option>').join("");
-  $("priority").innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option value="'+esc(x)+'" '+(x===selectedPri?'selected':'')+'>'+esc(x)+'</option>').join("");
+  const norm=v=>String(v??"").trim();
+  const cats=[...new Set(relevant.map(x=>norm(x.categoria)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const pris=[...new Set(relevant.map(x=>norm(x.prioridad)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+
+  $("cat").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+  $("priority").innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+  if(cats.includes(selectedCat)) $("cat").value=selectedCat; else $("cat").value="";
+  if(pris.includes(selectedPri)) $("priority").value=selectedPri; else $("priority").value="";
   $("status").value=selectedStatus;
 
-  const q=($("search").value||"").toLowerCase(),c=selectedCat,pr=selectedPri,st=selectedStatus;
-  const shown=relevant.filter(x=>
-    (!q||((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase().includes(q)) &&
-    (!c||x.categoria===c) && (!pr||x.prioridad===pr) && (!st||(st==="done")===x.personDone)
-  ).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
+  const q=($("search").value||"").toLowerCase().trim();
+  const c=$("cat").value;
+  const pr=$("priority").value;
+  const st=$("status").value;
+  const shown=relevant.filter(x=>{
+    const text=((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase();
+    const categoryOk=!c||norm(x.categoria)===norm(c);
+    const priorityOk=!pr||norm(x.prioridad)===norm(pr);
+    const statusOk=!st||(st==="done")===x.personDone;
+    return (!q||text.includes(q))&&categoryOk&&priorityOk&&statusOk;
+  }).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
+
   $("list").innerHTML=shown.length?"":"<div class=\"empty\">No hay artículos con estos filtros.</div>";
   shown.forEach(x=>{
     const row=document.createElement("div");row.className="item"+(x.personDone?" done":"");
@@ -334,7 +344,6 @@ async function renderItems(){
   });
   $("undoBtn").disabled=!undoStack.length;
 }
-
 async function tripForm(t=null){
   const selected=t?await api("bloomtrip_trip_type_links?select=trip_type_id&trip_id=eq."+t.id):[];
   const selectedIds=new Set(selected.map(x=>x.trip_type_id));
