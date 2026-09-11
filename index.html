@@ -310,31 +310,23 @@ async function renderItems(){
   const links=await api("bloomtrip_trip_item_people?select=*&person_id=eq."+currentPerson.id);
   const linkMap=new Map(links.map(x=>[x.trip_item_id,x]));
   const relevant=items.filter(x=>x.assignment_mode==="all"||linkMap.has(x.id)).map(x=>({...x,personDone:x.assignment_mode==="all"?!!x.done:!!linkMap.get(x.id)?.done}));
-
-  const t=relevant.length,d=relevant.filter(x=>x.personDone).length,pc=t?Math.round(d/t*100):0;
-  $("total").textContent=t;$("done").textContent=d;$("pending").textContent=t-d;$("pct").textContent=pc+"%";$("bar").style.width=pc+"%";
-
-  // Populate filter options without letting a render reset the user's selection.
   const norm=v=>String(v??"").trim();
   const cats=[...new Set(relevant.map(x=>norm(x.categoria)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const pris=[...new Set(relevant.map(x=>norm(x.prioridad)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
-  const catEl=$("cat"), priEl=$("priority"), stEl=$("status");
-  const oldCat=itemFilter.cat, oldPri=itemFilter.priority;
+  const catEl=$("cat"),priEl=$("priority"),stEl=$("status"),searchEl=$("search");
+  const savedCat=norm(itemFilter.cat),savedPri=norm(itemFilter.priority),savedStatus=itemFilter.status||"";
   catEl.innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
   priEl.innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
-  catEl.value=cats.includes(oldCat)?oldCat:"";
-  priEl.value=pris.includes(oldPri)?oldPri:"";
-  stEl.value=itemFilter.status||"";
-
-  const q=norm(itemFilter.search).toLowerCase(), c=norm(itemFilter.cat), pr=norm(itemFilter.priority), st=itemFilter.status;
+  catEl.value=savedCat; priEl.value=savedPri; stEl.value=savedStatus; searchEl.value=itemFilter.search||"";
+  // Read the actual controls after rebuilding them. This avoids stale state when the DOM is redrawn.
+  const q=norm(searchEl.value).toLowerCase(),c=norm(catEl.value),pr=norm(priEl.value),st=stEl.value;
+  itemFilter={search:searchEl.value,cat:c,priority:pr,status:st};
   const shown=relevant.filter(x=>{
     const text=((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase();
-    const categoryOk=!c||norm(x.categoria)===c;
-    const priorityOk=!pr||norm(x.prioridad)===pr;
-    const statusOk=!st||(st==="done")===x.personDone;
-    return (!q||text.includes(q))&&categoryOk&&priorityOk&&statusOk;
-  }).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
-
+    return (!q||text.includes(q)) && (!c||norm(x.categoria)===c) && (!pr||norm(x.prioridad)===pr) && (!st||(st==="done")===x.personDone);
+  }).sort((a,b)=>Number(a.personDone)-Number(b.personDone)||String(a.categoria||"").localeCompare(String(b.categoria||""),"es")||String(a.articulo||"").localeCompare(String(b.articulo||""),"es"));
+  const total=relevant.length,done=relevant.filter(x=>x.personDone).length;
+  $("total").textContent=total;$("done").textContent=done;$("pending").textContent=total-done;$("pct").textContent=(total?Math.round(done/total*100):0)+"%";$("bar").style.width=(total?Math.round(done/total*100):0)+"%";
   $("list").innerHTML=shown.length?"":"<div class=\"empty\">No hay artículos con estos filtros.</div>";
   shown.forEach(x=>{
     const row=document.createElement("div");row.className="item"+(x.personDone?" done":"");
@@ -343,6 +335,7 @@ async function renderItems(){
   });
   $("undoBtn").disabled=!undoStack.length;
 }
+
 async function tripForm(t=null){
   const selected=t?await api("bloomtrip_trip_type_links?select=trip_type_id&trip_id=eq."+t.id):[];
   const selectedIds=new Set(selected.map(x=>x.trip_type_id));
@@ -375,7 +368,11 @@ async function tripForm(t=null){
         const linksByItem=new Map();
         links.forEach(l=>{if(!linksByItem.has(l.general_item_id))linksByItem.set(l.general_item_id,new Set());linksByItem.get(l.general_item_id).add(l.module_id)});
         const selectedSet=new Set(selectedModuleIds);
+        const hasPet=defaults.some(p=>p.kind==="pet");
         const filteredBase=base.filter(x=>{
+          // Mascota en casa: si el viaje tiene una mascota configurada, sus tareas
+          // de cuidado se incluyen aunque la mascota no viaje.
+          if(hasPet && x.categoria==="Mascota") return true;
           const itemLinks=linksByItem.get(x.id);
           if(!itemLinks||!itemLinks.size)return true;
           return [...itemLinks].some(mid=>selectedSet.has(mid));
