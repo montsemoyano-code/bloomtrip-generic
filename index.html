@@ -107,9 +107,16 @@ async function renderTrips(){
 }
 async function openTrip(t){currentTrip=t;currentPerson=null;$("home").classList.add("hidden");$("detail").classList.remove("hidden");$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");$("tripTitle").textContent=t.name;$("tripMeta").textContent=tripMeta(t);renderProfiles()}
 async function renderProfiles(){
- const data=await api("bloomtrip_trip_items?select=id,assignment_mode,done,trip_id&trip_id=eq."+currentTrip.id);
- $("profiles").innerHTML="";
- people.forEach(p=>{const assigned=data.filter(x=>x.assignment_mode==="all"||x.assignment_mode==="selected").length;const d=document.createElement("div");d.className="profile";d.innerHTML='<div class="avatar">'+esc(p.emoji||"👤")+'</div><b>'+esc(p.name)+'</b><div class="pct">Abrir checklist</div>';d.onclick=()=>openPerson(p);$("profiles").append(d)})
+  await loadTripPeople();
+  const data=await api("bloomtrip_trip_items?select=id,assignment_mode,done,trip_id&trip_id=eq."+currentTrip.id);
+  $("profiles").innerHTML="";
+  tripPeople.forEach(tp=>{
+    const p=people.find(x=>x.id===tp.person_id)||{};
+    const d=document.createElement("div");d.className="profile";
+    d.innerHTML='<div class="avatar">'+esc(p.emoji||"👤")+'</div><b>'+esc(tp.display_name||p.name||"")+'</b><div class="pct">Abrir checklist</div>';
+    d.onclick=()=>openPerson({...p,id:tp.person_id,name:tp.display_name||p.name});
+    $("profiles").append(d);
+  });
 }
 async function tripForm(t=null){
  const selected=t?await api("bloomtrip_trip_type_links?select=trip_type_id&trip_id=eq."+t.id):[];
@@ -199,33 +206,14 @@ function peopleForm(){
 }
 function personForm(p=null){openModal('<h2>'+(p?"Editar perfil":"Nuevo perfil")+'</h2><div class="formgrid"><div class="field"><label>Nombre *</label><input id="pName" value="'+esc(p?.name||"")+'"></div><div class="field"><label>Tipo</label><select id="pKind"><option value="traveler" '+(p?.kind!=="pet"?"selected":"")+'>Viajero</option><option value="pet" '+(p?.kind==="pet"?"selected":"")+'>Mascota</option></select></div><div class="field"><label>Emoji</label><input id="pEmoji" value="'+esc(p?.emoji||"👤")+'"></div></div><div class="toolbar"><button id="cancel">Cancelar</button><button id="save" class="primary">Guardar</button></div>');$("cancel").onclick=closeModal;$("save").onclick=async()=>{try{const body={name:$("pName").value.trim(),kind:$("pKind").value,emoji:$("pEmoji").value.trim()||"👤",updated_at:new Date().toISOString()};if(!body.name)throw Error("El nombre es obligatorio.");if(p)await api("bloomtrip_people?id=eq."+p.id,{method:"PATCH",body:JSON.stringify(body)});else await api("bloomtrip_people",{method:"POST",body:JSON.stringify(body)});closeModal();await loadBase()}catch(e){alert("No se pudo guardar.")}}
 }
-$("newTripBtn").onclick=()=>tripForm();$("generalBtn").onclick=openGeneral;$("generalBack").onclick=()=>{$("general").classList.add("hidden");$("home").classList.remove("hidden");renderTrips()};$("generalAdd").onclick=generalForm;$("generalSearch").addEventListener("input",renderGeneral);$("generalCat").addEventListener("change",renderGeneral);$("managePeopleBtn").onclick=peopleForm;$("backBtn").onclick=()=>{$("detail").classList.add("hidden");$("home").classList.remove("hidden");currentTrip=null;currentPerson=null;renderTrips()};$("backPeopleBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden")};$("bottomBackBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};$("editTripBtn").onclick=()=>tripForm(currentTrip);$("addItemBtn").onclick=()=>itemForm();$("search").addEventListener("input",e=>{itemFilter.search=e.target.value;renderItems()});
+$("newTripBtn").onclick=()=>tripForm();$("cat").addEventListener("change",()=>{itemFilter.cat=$("cat").value;renderItems()});$("priority").addEventListener("change",()=>{itemFilter.priority=$("priority").value;renderItems()});$("status").addEventListener("change",()=>{itemFilter.status=$("status").value;renderItems()});$("generalBtn").onclick=openGeneral;$("generalBack").onclick=()=>{$("general").classList.add("hidden");$("home").classList.remove("hidden");renderTrips()};$("generalAdd").onclick=generalForm;$("generalSearch").addEventListener("input",renderGeneral);$("generalCat").addEventListener("change",renderGeneral);$("managePeopleBtn").onclick=peopleForm;$("backBtn").onclick=()=>{$("detail").classList.add("hidden");$("home").classList.remove("hidden");currentTrip=null;currentPerson=null;renderTrips()};$("backPeopleBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden")};$("bottomBackBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};$("editTripBtn").onclick=()=>tripForm(currentTrip);$("addItemBtn").onclick=()=>itemForm();$("search").addEventListener("input",e=>{itemFilter.search=e.target.value;renderItems()});
 $("cat").addEventListener("change",e=>{itemFilter.cat=e.target.value;renderItems()});
 $("priority").addEventListener("change",e=>{itemFilter.priority=e.target.value;renderItems()});
 $("status").addEventListener("change",e=>{itemFilter.status=e.target.value;renderItems()});
 renderTrips().catch(e=>alert("No se pudo conectar con BloomTrip.\\n"+e.message));
 </script>
 
-<script>
-/* BloomTrip v5.1: módulos de contexto */
-async function tripForm(t=null){
- const selected=t?await api("bloomtrip_trip_type_links?select=trip_type_id&trip_id=eq."+t.id):[];
- const selectedIds=new Set(selected.map(x=>x.trip_type_id));
- const selectedMods=t?await api("bloomtrip_trip_modules?select=module_id&trip_id=eq."+t.id):[];
- const selectedModIds=new Set(selectedMods.map(x=>x.module_id));
- const mods=await api("bloomtrip_modules?select=*&active=eq.true&order=module_group,sort_order,name");
- const checks=tripTypes.map(x=>'<label class="typecheck"><input type="checkbox" value="'+x.id+'" data-trip-type '+(selectedIds.has(x.id)?'checked':'')+'><span>'+esc(x.emoji||"🏷️")+' '+esc(x.name)+'</span></label>').join("");
- const groups=[...new Set(mods.map(m=>m.module_group))];
- const modChecks=groups.map(g=>'<div class="field full"><label>'+esc(g)+'</label><div class="triptypes">'+mods.filter(m=>m.module_group===g).map(m=>'<label class="typecheck"><input type="checkbox" value="'+m.id+'" data-trip-module '+(selectedModIds.has(m.id)?'checked':'')+'><span>'+esc(m.emoji||"")+' '+esc(m.name)+'</span></label>').join("")+'</div></div>').join("");
- openModal('<h2>'+(t?'Editar viaje':'Nuevo viaje')+'</h2><div class="formgrid"><div class="field full"><label>Nombre *</label><input id="fName" value="'+esc(t?.name||"")+'"></div><div class="field"><label>Destino</label><input id="fDest" value="'+esc(t?.destination||"")+'"></div><div class="field"><label>Fecha de inicio</label><input id="fStart" type="date" value="'+(t?.start_date||"")+'"></div><div class="field"><label>Fecha de fin</label><input id="fEnd" type="date" value="'+(t?.end_date||"")+'"></div><div class="field full"><label>Tipo de viaje</label><div class="triptypes">'+checks+'</div></div>'+modChecks+'</div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
- $("cancel").onclick=closeModal;$('save').onclick=async()=>{try{const name=$("fName").value.trim();if(!name)throw Error('El nombre es obligatorio.');const body={name,destination:$("fDest").value.trim()||null,start_date:$("fStart").value||null,end_date:$("fEnd").value||null,updated_at:new Date().toISOString()};let id=t?.id;if(t)await api("bloomtrip_trips?id=eq."+id,{method:'PATCH',body:JSON.stringify(body)});else{id=(await api("bloomtrip_trips",{method:'POST',body:JSON.stringify({...body,is_template:false})}))[0].id;const defaults=await api("bloomtrip_people?select=id,name&active=eq.true&order=sort_order,id");if(defaults.length)await api("bloomtrip_trip_people",{method:'POST',body:JSON.stringify(defaults.map(p=>({trip_id:id,person_id:p.id,display_name:p.name})))});const base=await api("bloomtrip_general_items?select=*&active=eq.true&order=categoria,articulo");if(base.length)await api("bloomtrip_trip_items",{method:'POST',body:JSON.stringify(base.map(x=>({trip_id:id,articulo:x.articulo,categoria:x.categoria,subcategoria:x.subcategoria,unidades:x.unidades,prioridad:x.prioridad,donde_llevarlo:x.donde_llevarlo,notas:x.notas,assignment_mode:'all',done:false,general_item_id:x.id,item_type:x.item_type||'Artículo físico',phase:x.phase||''})))})}
- await api("bloomtrip_trip_type_links?trip_id=eq."+id,{method:'DELETE'});const ids=[...document.querySelectorAll('[data-trip-type]:checked')].map(c=>Number(c.value));if(ids.length)await api("bloomtrip_trip_type_links",{method:'POST',body:JSON.stringify(ids.map(trip_type_id=>({trip_id:id,trip_type_id})))});
- await api("bloomtrip_trip_modules?trip_id=eq."+id,{method:'DELETE'});const mids=[...document.querySelectorAll('[data-trip-module]:checked')].map(c=>Number(c.value));if(mids.length)await api("bloomtrip_trip_modules",{method:'POST',body:JSON.stringify(mids.map(module_id=>({trip_id:id,module_id})))});
- closeModal();await renderTrips();
- }catch(e){alert('No se pudo guardar el viaje.\n'+e.message)}};
-}
-async function renderTrips(){await loadBase();const box=$("trips");box.innerHTML="";if(!trips.length){box.innerHTML='<div class="empty">Todavía no hay viajes. Crea el primero.</div>';return}trips.forEach(t=>{const d=document.createElement("div");d.className="trip";d.innerHTML='<div class="trip-main"><div class="trip-name">'+esc(t.name)+'</div><div class="trip-meta">'+esc(tripMeta(t))+'</div></div><div class="actions"><button data-open>Abrir</button><button data-edit>✏️</button><button class="danger" data-del>🗑️</button></div>';d.querySelector('[data-open]').onclick=()=>openTrip(t);d.querySelector('[data-edit]').onclick=()=>tripForm(t);d.querySelector('[data-del]').onclick=()=>deleteTrip(t);box.append(d)})}
-</script>
+
 </body>
 </html>
 <script>
@@ -309,7 +297,7 @@ async function renderItems(){
   items=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);
   const links=await api("bloomtrip_trip_item_people?select=*&person_id=eq."+currentPerson.id);
   const linkMap=new Map(links.map(x=>[x.trip_item_id,x]));
-  const relevant=items.filter(x=>x.assignment_mode==="all"||linkMap.has(x.id)).map(x=>({...x,personDone:x.assignment_mode==="all"?!!x.done:!!linkMap.get(x.id)?.done}));
+  const relevant=items.filter(x=>x.assignment_mode==="all"||linkMap.has(x.id)).filter(x=>currentPerson?.kind==="pet" ? x.categoria==="Mascota" : x.categoria!=="Mascota").map(x=>({...x,personDone:x.assignment_mode==="all"?!!x.done:!!linkMap.get(x.id)?.done}));
   const norm=v=>String(v??"").trim();
   const cats=[...new Set(relevant.map(x=>norm(x.categoria)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const pris=[...new Set(relevant.map(x=>norm(x.prioridad)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
@@ -341,11 +329,13 @@ async function tripForm(t=null){
   const selectedIds=new Set(selected.map(x=>x.trip_type_id));
   const selectedMods=t?await api("bloomtrip_trip_modules?select=module_id&trip_id=eq."+t.id):[];
   const selectedModIds=new Set(selectedMods.map(x=>x.module_id));
+  const selectedTripPeople=t?await api("bloomtrip_trip_people?select=person_id&trip_id=eq."+t.id):[];
+  const selectedTripPeopleIds=new Set(selectedTripPeople.map(x=>x.person_id));
   const mods=await api("bloomtrip_modules?select=*&active=eq.true&order=module_group,sort_order,name");
   const checks=tripTypes.map(x=>'<label class="typecheck"><input type="checkbox" value="'+x.id+'" data-trip-type '+(selectedIds.has(x.id)?"checked":"")+'><span>'+esc(x.emoji||"🏷️")+' '+esc(x.name)+'</span></label>').join("");
   const groups=[...new Set(mods.map(m=>m.module_group))];
   const modChecks=groups.map(g=>'<div class="field full"><label>'+esc(g)+"</label><div class=\"triptypes\">"+mods.filter(m=>m.module_group===g).map(m=>'<label class="typecheck"><input type="checkbox" value="'+m.id+'" data-trip-module '+(selectedModIds.has(m.id)?"checked":"")+'><span>'+esc(m.emoji||"")+" "+esc(m.name)+'</span></label>').join("")+"</div></div>").join("");
-  openModal('<h2>'+(t?"Editar viaje":"Nuevo viaje")+'</h2><div class="formgrid"><div class="field full"><label>Nombre *</label><input id="fName" value="'+esc(t?.name||"")+'"></div><div class="field"><label>Destino</label><input id="fDest" value="'+esc(t?.destination||"")+'"></div><div class="field"><label>Fecha de inicio</label><input id="fStart" type="date" value="'+(t?.start_date||"")+'"></div><div class="field"><label>Fecha de fin</label><input id="fEnd" type="date" value="'+(t?.end_date||"")+'"></div><div class="field full"><label>Tipo de viaje (puedes elegir varios)</label><div class="triptypes">'+checks+'</div></div>'+modChecks+'</div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
+  openModal('<h2>'+(t?"Editar viaje":"Nuevo viaje")+'</h2><div class="formgrid"><div class="field full"><label>Nombre *</label><input id="fName" value="'+esc(t?.name||"")+'"></div><div class="field"><label>Destino</label><input id="fDest" value="'+esc(t?.destination||"")+'"></div><div class="field"><label>Fecha de inicio</label><input id="fStart" type="date" value="'+(t?.start_date||"")+'"></div><div class="field"><label>Fecha de fin</label><input id="fEnd" type="date" value="'+(t?.end_date||"")+'"></div><div class="field full"><label>Tipo de viaje (puedes elegir varios)</label><div class="triptypes">'+checks+'</div></div><div class="field full"><label>¿Quién participa en este viaje?</label><div class="triptypes">'+people.map(p=>'<label class="typecheck"><input type="checkbox" value="'+p.id+'" data-trip-person '+((t?selectedTripPeopleIds.has(p.id):p.kind!=="pet")?"checked":"")+'><span>'+esc(p.emoji||"👤")+' '+esc(p.name)+(p.kind==="pet"?" · mascota":"")+'</span></label>').join("")+'</div></div>'+modChecks+'</div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
   $("cancel").onclick=closeModal;
   $("save").onclick=async()=>{
     try{
@@ -357,8 +347,10 @@ async function tripForm(t=null){
         await api("bloomtrip_trips?id=eq."+id,{method:"PATCH",body:JSON.stringify(body)});
       }else{
         id=(await api("bloomtrip_trips",{method:"POST",body:JSON.stringify({...body,is_template:false})}))[0].id;
-        const defaults=await api("bloomtrip_people?select=id,name&active=eq.true&order=sort_order,id");
-        if(defaults.length)await api("bloomtrip_trip_people",{method:"POST",body:JSON.stringify(defaults.map(p=>({trip_id:id,person_id:p.id,display_name:p.name})))});
+        const defaults=await api("bloomtrip_people?select=id,name,kind,emoji&active=eq.true&order=sort_order,id");
+        const selectedPeopleIds=[...document.querySelectorAll("[data-trip-person]:checked")].map(c=>Number(c.value));
+        const chosenPeople=defaults.filter(p=>selectedPeopleIds.includes(p.id));
+        if(chosenPeople.length)await api("bloomtrip_trip_people",{method:"POST",body:JSON.stringify(chosenPeople.map(p=>({trip_id:id,person_id:p.id,display_name:p.name})))});
 
         /* Checklist inicial: artículos base (sin módulos) + artículos asociados
            a CUALQUIERA de los módulos seleccionados. Los artículos ligados a otro
@@ -368,11 +360,10 @@ async function tripForm(t=null){
         const linksByItem=new Map();
         links.forEach(l=>{if(!linksByItem.has(l.general_item_id))linksByItem.set(l.general_item_id,new Set());linksByItem.get(l.general_item_id).add(l.module_id)});
         const selectedSet=new Set(selectedModuleIds);
-        const hasPet=defaults.some(p=>p.kind==="pet");
+        const hasPet=chosenPeople.some(p=>p.kind==="pet");
         const filteredBase=base.filter(x=>{
-          // Mascota en casa: si el viaje tiene una mascota configurada, sus tareas
-          // de cuidado se incluyen aunque la mascota no viaje.
-          if(hasPet && x.categoria==="Mascota") return true;
+          // Los artículos de mascota solo se generan si una mascota participa en el viaje.
+          if(x.categoria==="Mascota") return hasPet;
           const itemLinks=linksByItem.get(x.id);
           if(!itemLinks||!itemLinks.size)return true;
           return [...itemLinks].some(mid=>selectedSet.has(mid));
@@ -386,6 +377,10 @@ async function tripForm(t=null){
       if(typeIds.length)await api("bloomtrip_trip_type_links",{method:"POST",body:JSON.stringify(typeIds.map(trip_type_id=>({trip_id:id,trip_type_id})))});
       await api("bloomtrip_trip_modules?trip_id=eq."+id,{method:"DELETE"});
       if(selectedModuleIds.length)await api("bloomtrip_trip_modules",{method:"POST",body:JSON.stringify(selectedModuleIds.map(module_id=>({trip_id:id,module_id})))});
+      const selectedPeopleIds=[...document.querySelectorAll("[data-trip-person]:checked")].map(c=>Number(c.value));
+      const currentTP=await api("bloomtrip_trip_people?select=person_id&trip_id=eq."+id);
+      if(currentTP.length)await api("bloomtrip_trip_people?trip_id=eq."+id,{method:"DELETE"});
+      if(selectedPeopleIds.length){const allPeople=await api("bloomtrip_people?select=id,name&active=eq.true");const chosen=allPeople.filter(p=>selectedPeopleIds.includes(p.id));await api("bloomtrip_trip_people",{method:"POST",body:JSON.stringify(chosen.map(p=>({trip_id:id,person_id:p.id,display_name:p.name})))})}
       closeModal();await renderTrips();
     }catch(e){alert("No se pudo guardar el viaje.\n"+e.message)}
   };
