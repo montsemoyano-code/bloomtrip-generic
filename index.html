@@ -19,7 +19,16 @@ async function postTripItemPeople(rows){
   const unique=[];const seen=new Set();
   for(const r of (rows||[])){const k=String(r.trip_item_id)+":"+String(r.person_id);if(seen.has(k))continue;seen.add(k);unique.push(r);}
   if(!unique.length)return [];
-  return api("bloomtrip_trip_item_people",{method:"POST",body:JSON.stringify(unique),headers:{Prefer:"resolution=ignore-duplicates,return=representation"}});
+  const itemIds=[...new Set(unique.map(r=>Number(r.trip_item_id)).filter(Number.isFinite))];
+  const personIds=[...new Set(unique.map(r=>Number(r.person_id)).filter(Number.isFinite))];
+  let existing=[];
+  if(itemIds.length&&personIds.length){
+    existing=await api("bloomtrip_trip_item_people?trip_item_id=in.("+itemIds.join(",")+")&person_id=in.("+personIds.join(",")+")&select=trip_item_id,person_id").catch(()=>[]);
+  }
+  const have=new Set(existing.map(r=>String(r.trip_item_id)+":"+String(r.person_id)));
+  const missing=unique.filter(r=>!have.has(String(r.trip_item_id)+":"+String(r.person_id)));
+  if(!missing.length)return existing;
+  return api("bloomtrip_trip_item_people",{method:"POST",body:JSON.stringify(missing),headers:{Prefer:"resolution=ignore-duplicates,return=representation"}});
 }
 
 async function initTripPeople(t,selectedPetIds=null,selectedTravelerIds=null){
