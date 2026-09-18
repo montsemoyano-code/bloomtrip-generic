@@ -39,11 +39,12 @@ async function initTripPeople(t,selectedPetIds=null,selectedTravelerIds=null){
   const ids=selectedPetIds===null?[...new Set(existing.filter(tp=>tp.person?.kind==="pet").map(tp=>Number(tp.person_id)))]:selectedPetIds.map(Number);
   const wanted=travelers.concat(petTrip?people.filter(p=>p.kind==="pet"&&ids.includes(Number(p.id))):[]);
   const wantedIds=new Set(wanted.map(p=>Number(p.id)));
-  const tripItemIds=new Set((await api("bloomtrip_trip_items?trip_id=eq."+t.id+"&select=id").catch(()=>[])).map(x=>Number(x.id)));
-  for(const tp of existing.filter(tp=>!wantedIds.has(Number(tp.person_id)))){
-    const oldLinks=await api("bloomtrip_trip_item_people?person_id=eq."+tp.person_id+"&select=trip_item_id").catch(()=>[]);
-    for(const l of oldLinks.filter(x=>tripItemIds.has(Number(x.trip_item_id)))) await api("bloomtrip_trip_item_people?trip_item_id=eq."+l.trip_item_id+"&person_id=eq."+tp.person_id,{method:"DELETE"}).catch(()=>{});
-    await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&person_id=eq."+tp.person_id,{method:"DELETE"}).catch(()=>{});
+  const tripItemIds=[...(await api("bloomtrip_trip_items?trip_id=eq."+t.id+"&select=id").catch(()=>[])).map(x=>Number(x.id)).filter(Number.isFinite)];
+  const removedPeople=existing.filter(tp=>!wantedIds.has(Number(tp.person_id)));
+  if(removedPeople.length){
+    const removedIds=[...new Set(removedPeople.map(tp=>Number(tp.person_id)).filter(Number.isFinite))];
+    if(tripItemIds.length&&removedIds.length) await api("bloomtrip_trip_item_people?trip_item_id=in.("+tripItemIds.join(',')+")&person_id=in.("+removedIds.join(',')+")",{method:"DELETE"}).catch(()=>{});
+    await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&person_id=in.("+removedIds.join(',')+")",{method:"DELETE"}).catch(()=>{});
   }
   existing=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=*,person:bloomtrip_people(id,name,kind,emoji)&order=person_id");
   const existingIds=new Set(existing.map(x=>Number(x.person_id)));
