@@ -1,293 +1,155 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f2ff"><title>BloomTrip</title><style>
-:root{--bg:#faf8f5;--card:#fff;--text:#25232a;--muted:#77727d;--line:#e8e2e9;--accent:#7b61a8;--danger:#b94b4b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1050px;margin:auto;padding:20px 16px 50px}h1{margin:0;font-size:30px}.sub{color:var(--muted);margin:4px 0 18px}button,input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff;color:var(--text)}button{cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.danger{color:var(--danger);border-color:#e7caca}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.trips{display:grid;gap:8px}.trip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px}.trip-main{min-width:0}.trip-name{font-weight:700}.trip-meta{font-size:13px;color:var(--muted);margin-top:3px}.actions{display:flex;gap:6px;flex-wrap:wrap}.profiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.profile{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px;text-align:center;cursor:pointer}.avatar{font-size:38px}.profile b{display:block;margin-top:5px}.pct{color:var(--muted);font-size:13px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}.stat small{display:block;color:var(--muted)}.stat b{font-size:20px}.progress{height:10px;background:#e9e5ea;border-radius:99px;overflow:hidden;margin:10px 0 18px}.bar{height:100%;background:var(--accent);width:0}.filters{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:8px;margin:12px 0}.item{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0}.item input{margin-top:3px;width:20px;height:20px}.name{font-weight:650}.done .name{text-decoration:line-through;color:#999}.meta{font-size:12px;color:var(--muted);margin-top:3px}.tag{display:inline-block;background:#f0edf2;border-radius:99px;padding:3px 7px;margin:4px 4px 0 0;font-size:11px}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.modal.open{display:flex}.dialog{background:var(--card);border-radius:18px;padding:18px;max-width:760px;width:100%;max-height:92vh;overflow:auto}.dialog h2{margin-top:0}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:650;color:var(--muted)}textarea{min-height:90px}.checkrow{display:flex;gap:8px;align-items:center;margin:8px 0}.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.checks label{border:1px solid var(--line);border-radius:10px;padding:8px}.empty{padding:24px;text-align:center;color:var(--muted)}.hidden{display:none!important}.section-title{margin:18px 0 8px}.hint{font-size:12px;color:var(--muted)}
-@media(max-width:700px){.profiles{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.trip{align-items:flex-start;flex-direction:column}.checks{grid-template-columns:1fr}}
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Correcaminos · 100K Madrid–Segovia</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#17202a;--muted:#707984;--green:#11835f;--green2:#0b7656;--gold:#f3d98e;--red:#c1262d;--line:#e4e7ea}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:780px;margin:auto;padding:14px 14px 30px}
+.hero{background:linear-gradient(135deg,#0d8965,#19a77d);color:#fff;border-radius:22px;padding:17px 18px;margin-bottom:14px;min-height:112px}
+.hero img{width:78px;height:78px;object-fit:contain;float:right;margin-left:10px}.hero h1{margin:0 0 3px;font-size:28px}.hero p{margin:0 0 8px;font-size:16px}.small{font-size:13px}
+.card{background:var(--card);border-radius:20px;padding:17px;margin:14px 0;box-shadow:0 2px 12px #0000000b;border:1px solid #e4e7ea}
+.kpi{background:#101827;color:#fff;border-radius:20px;padding:20px;margin:14px 0}.kpi .label{color:#bfc7d2;font-size:14px}.kpi .big{font-size:42px;font-weight:800;line-height:1.05;margin:5px 0}.kpi .sub{color:#cbd2dc}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+h2{font-size:20px;margin:0 0 10px}.muted{color:var(--muted);font-size:14px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:5px}
+select,input,button{font:inherit}select,input{width:100%;border:1px solid #cbd2d8;border-radius:13px;padding:11px;background:#fff;color:var(--text)}
+.timegrid input{text-align:center;font-size:22px;font-weight:750;padding:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+button{border:0;border-radius:13px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:var(--green);color:#fff}.secondary{background:#edf5f1;color:#12684e}.gold{background:#fff2cf;color:#735500}.danger{background:#fdeced;color:#a52329}
+.status{padding:11px 13px;border-radius:13px;background:#fff4d4;color:#745800;margin-top:11px}.status.ok{background:#e8f6ef;color:#126c4e}.status.warn{background:#fdeced;color:#9c272d}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+.badge{font-size:12px;font-weight:800;padding:5px 8px;border-radius:99px;background:#eef1f3;white-space:nowrap}.ahead{background:#e8f6ef;color:#126c4e}.late{background:#fdeced;color:#9c272d}
+.tabs{display:flex;gap:7px;overflow:auto;margin:12px 0}.tabs button{white-space:nowrap;background:#e9edef;color:#45515d}.tabs button.active{background:var(--green);color:#fff}
+.simbox{background:#fff9e9;border:1px solid #efd48a;border-radius:16px;padding:14px}.transport{display:grid;gap:9px}.transport .item{padding:12px;border-radius:14px;background:#f7f8f9;border:1px solid #e4e7ea}.transport b{display:block;margin-bottom:3px}
+.hidden{display:none}.foot{color:#7a828b;font-size:12px;text-align:center;margin-top:18px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.hero img{width:64px;height:64px}.kpi .big{font-size:38px}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<img src="logo.png" alt="Correcaminos">
+<h1>Correcaminos · 100K Madrid–Segovia</h1>
+<p>Seguimiento en directo · salida 05:00</p>
+<div class="small">Escenarios, pasos reales y transporte para el seguimiento de carrera</div>
+</section>
 
-.running-panel{margin:16px 0}.running-panel h3{margin:0 0 6px}.running-intro{color:var(--muted);font-size:13px;margin-bottom:12px}.running-grid{display:grid;grid-template-columns:1fr;gap:10px}.running-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}.running-section h4{margin:0 0 10px}.race-check{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--line)}.race-check:last-child{border-bottom:0}.race-check input{width:19px;height:19px;margin-top:2px}.race-check .meta{margin-top:2px}.bag-card{border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0}.bag-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.bag-title{font-weight:700}.bag-location{font-size:12px;color:var(--muted)}.bag-items{margin-top:8px}.bag-item{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}.bag-item:last-child{border-bottom:0}.bag-item input{width:18px;height:18px}.bag-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}@media(max-width:700px){.bag-head{flex-direction:column}.bag-head .actions{width:100%}}
-</style></head><body><div class="wrap"><h1>BloomTrip</h1><div class="sub" id="subtitle">Tu checklist de viajes</div>
-<section id="home"><div class="toolbar"><button class="primary" id="newTripBtn">✈️ Nuevo viaje</button><button id="generalBtn">📚 Lista general</button></div><div class="card"><h2>Mis viajes</h2><div id="trips" class="trips"></div></div></section>
-<section id="general" class="hidden"><div class="toolbar"><button id="generalBack">← Mis viajes</button><button class="primary" id="generalAdd">➕ Añadir artículo general</button></div><h2>📚 Lista general de BloomTrip</h2><div class="sub">Los artículos generales se incorporan automáticamente a los nuevos viajes cuando corresponda.</div><div class="filters"><input id="gSearch" placeholder="🔎 Buscar..."><select id="gCat"></select><select id="gType"><option value="">Todos los tipos</option><option>Artículo físico</option><option>Digital</option><option>Documento / trámite</option><option>Tarea</option></select><select id="gPhase"><option value="">Todas las fases</option><option>Previo al viaje</option><option>Durante el viaje</option><option>Mascota en casa</option></select></div><div id="generalList"></div></section>
-<section id="detail" class="hidden"><div class="toolbar"><button id="backBtn">← Mis viajes</button><button id="editTripBtn">✏️ Editar viaje</button><button id="peopleBtn">👥 Nombres del viaje</button><button id="addItemBtn" class="primary">＋ Añadir artículo</button></div><h2 id="tripTitle"></h2><div class="sub" id="tripMeta"></div><div id="weatherCard" class="card hidden"></div><div id="profiles" class="profiles"></div>
-<div id="runningPanel" class="running-panel hidden">
-  <div class="running-section">
-    <h3>🏃 Carrera</h3>
-    <div class="running-intro">Checklist específico de la carrera. El equipaje general solo aparece si seleccionas otros módulos.</div>
-    <div id="raceChecklist"></div>
-  </div>
-  <div class="running-section" style="margin-top:10px">
-    <div class="bag-head"><div><h4>🎒 Mochilas de repuesto</h4><div class="running-intro">Añade tantas como necesites. Cada mochila tiene su propia ubicación y checklist.</div></div><button class="primary" id="addRunningBagBtn">➕ Añadir mochila</button></div>
-    <div id="runningBags"></div>
-  </div>
-</div><div id="personDetail" class="hidden"><div class="toolbar"><button id="backPeopleBtn">← Viajeros</button></div><h2 id="personTitle"></h2><div class="summary"><div class="stat"><small>Total</small><b id="total">0</b></div><div class="stat"><small>Preparado</small><b id="done">0</b></div><div class="stat"><small>Pendiente</small><b id="pending">0</b></div><div class="stat"><small>Progreso</small><b id="pct">0%</b></div></div><div class="progress"><div class="bar" id="bar"></div></div><div class="filters"><input id="search" placeholder="🔎 Buscar..."><select id="cat"></select><select id="priority"></select><select id="status"><option value="">Todos</option><option value="pending">Pendientes</option><option value="done">Completados</option></select></div><div class="toolbar"><button id="undoBtn" disabled>↶ Deshacer</button></div><div id="list"></div><div class="toolbar"><button id="bottomBackBtn">← Volver</button></div></div></section></div>
-<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div>
+<div class="kpi">
+<div class="label">LLEGADA ESTIMADA</div>
+<div class="big" id="finish">21:00</div>
+<div class="sub" id="finishSub">Escenario personalizado de 16 h · límite 22:59</div>
+</div>
+
+<section class="grid">
+<div class="card"><div class="muted">Último paso</div><h2 id="lastPoint">Salida</h2><div id="lastTime">05:00</div></div>
+<div class="card"><div class="muted">Ritmo medio</div><h2 id="pace">—</h2><div class="muted" id="paceSub">Sin paso real</div></div>
+</section>
+
+<section class="card">
+<div class="muted">Situación respecto al límite</div>
+<h2 id="limitDiff">—</h2><div class="muted" id="limitText">Previsión personalizada</div>
+</section>
+
+<section class="card">
+<h2>Próximos puntos</h2><div id="table"></div>
+</section>
+
+<section class="card">
+<h2>Registrar paso real</h2>
+<div class="grid">
+<div><label for="control">Punto</label><select id="control"></select></div>
+<div>
+<label>Hora de paso</label>
+<div class="timegrid grid3">
+<input id="hh" inputmode="numeric" maxlength="2" placeholder="HH" aria-label="Horas">
+<input id="mm" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="Minutos">
+<input id="ss" inputmode="numeric" maxlength="2" placeholder="SS" aria-label="Segundos">
+</div>
+</div>
+</div>
+<div class="actions">
+<button class="secondary" id="now">Ahora</button><button class="gold" id="plus1">+1 min</button><button class="gold" id="plus5">+5 min</button>
+<button class="primary" id="save">Guardar paso</button><button class="danger" id="clear">Borrar</button>
+</div>
+<div class="muted" style="margin-top:8px">En móvil puedes escribir cada parte con el teclado numérico. Los segundos son opcionales: si los dejas vacíos se usa 00.</div>
+<div id="msg" class="status">Introduce la hora de paso.</div>
+</section>
+
+<section class="card">
+<h2>Simulación</h2>
+<div class="simbox">
+<div class="muted">Modo simulación: puedes probar distintos ritmos/escenarios sin modificar los pasos reales.</div>
+<div class="grid" style="margin-top:10px">
+<div><label for="scenario">Escenario</label><select id="scenario"></select></div>
+<div><label>Previsión de llegada</label><input id="simFinish" readonly></div>
+</div>
+<div class="actions"><button class="primary" id="simApply">Calcular simulación</button><button class="secondary" id="simReset">Volver a 16 h</button></div>
+</div>
+<div id="simTable" style="margin-top:10px"></div>
+</section>
+
+<section class="card">
+<h2>Transportes</h2>
+<div class="muted" style="margin-bottom:10px">Opciones para desplazarte entre controles durante el seguimiento. Los horarios concretos del día de carrera conviene verificarlos antes de salir.</div>
+<div class="transport">
+<div class="item"><b>Madrid → Tres Cantos</b><span class="small">Cercanías C-4b y autobuses interurbanos. Buen punto para empezar el seguimiento sin coche.</span></div>
+<div class="item"><b>Madrid → Colmenar Viejo</b><span class="small">Cercanías C-4b y autobuses interurbanos.</span></div>
+<div class="item"><b>Madrid → Manzanares El Real</b><span class="small">Autobús interurbano 724. Permite plantear el seguimiento desde la zona de Manzanares.</span></div>
+<div class="item"><b>Madrid → Mataelpino</b><span class="small">Autobuses 724 / 672 según recorrido y horario.</span></div>
+<div class="item"><b>Navacerrada / La Barranca</b><span class="small">Autobús 691 hasta Navacerrada; el control está en La Barranca, por lo que hay que contar con el desplazamiento a pie.</span></div>
+<div class="item"><b>Cercedilla</b><span class="small">Cercanías C-8b y autobús 684. Es uno de los puntos más prácticos para combinar transporte público y seguimiento.</span></div>
+<div class="item"><b>Fuenfría / Cruz de la Gallega</b><span class="small">No hay acceso directo en transporte público al control; el acceso requiere caminar por la montaña.</span></div>
+<div class="item"><b>Segovia</b><span class="small">Destino final con conexiones de transporte. Desde Cercedilla existe conexión ferroviaria hacia Segovia.</span></div>
+</div>
+</section>
+
+<div class="foot">Correcaminos · datos de seguimiento preparados para la 100K Madrid–Segovia</div>
+</main>
+
 <script>
-const SUPABASE_URL="https://aklffkhjvsruxrqvbbqg.supabase.co",SUPABASE_KEY="sb_publishable_eukhXd1rFXuuRBrkfmAVmA_HujBVLOG";$=id=>document.getElementById(id);const esc=s=>String(s??"").replace(/[&<>\"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));let people=[],trips=[],items=[],categories=[],locations=[],modules=[],currentTrip=null,currentPerson=null,tripPeople=[],undoStack=[];
-async function api(path,opts={}){const r=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...opts,headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json",Prefer:opts.method==="POST"?"return=representation":"return=minimal",...(opts.headers||{})}});if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json()}
-function openModal(html){$("dialog").innerHTML=html;$("modal").classList.add("open")}function closeModal(){$("modal").classList.remove("open")}$("modal").onclick=e=>{if(e.target===$("modal"))closeModal()};function fmtDate(v){if(!v)return"";return new Date(v+"T00:00:00").toLocaleDateString("es-ES")}function tripMeta(t){const mods=(t._modules||[]).map(x=>x.name).join(", ");return [t.destination,fmtDate(t.start_date)+(t.end_date?" – "+fmtDate(t.end_date):""),t.season,mods].filter(Boolean).join(" · ")}
-async function loadBase(){[people,categories,locations,trips,modules]=await Promise.all([api("bloomtrip_people?select=*&active=eq.true&is_default=eq.true&order=sort_order,id"),api("bloomtrip_categories?select=*&active=eq.true&order=sort_order,name"),api("bloomtrip_locations?select=*&active=eq.true&order=sort_order,name"),api("bloomtrip_trips?select=*&status=eq.active&is_template=eq.false&order=created_at.desc"),api("bloomtrip_modules?select=*&active=eq.true&order=sort_order,name")]);const settings=await api("bloomtrip_settings?select=key,value");const s=Object.fromEntries(settings.map(x=>[x.key,x.value]));$("subtitle").textContent=s.app_subtitle||"Tu checklist de viajes";for(const t of trips){t._modules=await api("bloomtrip_trip_modules?trip_id=eq."+t.id+"&select=module_id").then(async links=>{if(!links.length)return[];const ids=links.map(x=>x.module_id).join(",");return modules.filter(m=>ids.split(",").includes(String(m.id)))}).catch(()=>[])} }
-async function renderTrips(){await loadBase();const box=$("trips");box.innerHTML="";if(!trips.length){box.innerHTML='<div class="empty">Todavía no hay viajes. Crea el primero.</div>';return}trips.forEach(t=>{const d=document.createElement("div");d.className="trip";d.innerHTML='<div class="trip-main"><div class="trip-name">'+esc(t.name)+'</div><div class="trip-meta">'+esc(tripMeta(t))+'</div></div><div class="actions"><button data-open>Abrir</button><button data-edit>✏️</button><button class="danger" data-del>🗑️</button></div>';d.querySelector("[data-open]").onclick=()=>openTrip(t);d.querySelector("[data-edit]").onclick=()=>tripForm(t);d.querySelector("[data-del]").onclick=()=>deleteTrip(t);box.append(d)})}
-function getPetModuleId(){const m=modules.find(x=>(x.name||"").toLowerCase()==="viaje con mascota");return m?Number(m.id):null}function isPetTrip(t){return getPetModuleId()!=null&&(t?._modules||[]).some(m=>Number(m.id)===getPetModuleId())}function isPetTripByModules(ids){const pid=getPetModuleId();return pid!=null&&ids.map(Number).includes(pid)}
-function personIsPet(tp){return tp?.person?.kind==="pet"}
-function legacyAppliesToPerson(x,tp,general){if(x.assignment_mode!=="all")return false;const pet=personIsPet(tp);if((general?.categoria||x.categoria)==="Mascota") {if(!pet)return false;const targets=(general?.pet_targets||[]).map(v=>String(v).toLowerCase());if(!targets.length)return true;return targets.includes(String(tp.person?.kind||tp.person?.name||"").toLowerCase())||targets.includes(String(tp.person?.name||"").toLowerCase())}return !pet}
-async function postTripItemPeople(rows){
-  const unique=[];const seen=new Set();
-  for(const r of (rows||[])){const k=String(r.trip_item_id)+":"+String(r.person_id);if(seen.has(k))continue;seen.add(k);unique.push(r);}
-  if(!unique.length)return [];
-  const itemIds=[...new Set(unique.map(r=>Number(r.trip_item_id)).filter(Number.isFinite))];
-  const personIds=[...new Set(unique.map(r=>Number(r.person_id)).filter(Number.isFinite))];
-  let existing=[];
-  if(itemIds.length&&personIds.length){
-    existing=await api("bloomtrip_trip_item_people?trip_item_id=in.("+itemIds.join(",")+")&person_id=in.("+personIds.join(",")+")&select=trip_item_id,person_id").catch(()=>[]);
-  }
-  const have=new Set(existing.map(r=>String(r.trip_item_id)+":"+String(r.person_id)));
-  const missing=unique.filter(r=>!have.has(String(r.trip_item_id)+":"+String(r.person_id)));
-  if(!missing.length)return existing;
-  return api("bloomtrip_trip_item_people",{method:"POST",body:JSON.stringify(missing),headers:{Prefer:"resolution=ignore-duplicates,return=representation"}});
+const zones=[
+["Salida",0,"05:00","05:10"],["Tres Cantos",17.24,"06:15","07:50"],["Colmenar Viejo",26.20,"07:00","09:20"],
+["Manzanares El Real",41.20,"08:00","11:50"],["Mataelpino",48.59,"08:40","13:00"],["Navacerrada · La Barranca",57.53,"09:20","14:40"],
+["Cercedilla",63.98,"10:00","15:45"],["Alto de la Fuenfría",78.71,"11:00","18:40"],
+["Cruz de la Gallega",90.32,"12:00","20:50"],["Segovia",100.61,"12:50","22:59"]
+];
+const scenarios={16:"16 h",16.5:"16 h 30",17:"17 h",17.5:"17 h 30",17.983333:"17 h 59 (límite)"};
+const base16=["05:00","07:25","08:41","11:08","12:23","13:54","15:00","17:24","19:18","21:00"];
+const real={};
+const $=id=>document.getElementById(id);
+zones.forEach((z,i)=>{let o=document.createElement("option");o.value=i;o.textContent=`${z[0]} · ${z[1].toFixed(1)} km`;$("control").appendChild(o)});
+Object.keys(scenarios).forEach(k=>{let o=document.createElement("option");o.value=k;o.textContent=scenarios[k];$("scenario").appendChild(o)});
+$("scenario").value="16";
+function mins(t){let a=t.split(":").map(Number);return a[0]*60+a[1]+(a[2]||0)/60}
+function fmt(x){x=((x%1440)+1440)%1440;let h=Math.floor(x/60),m=Math.floor(x%60),s=Math.round((x-Math.floor(x))*60);if(s===60){s=0;m++}if(m===60){m=0;h++}return `${String(h%24).padStart(2,"0")}:${String(m).padStart(2,"0")}${s?"":"":""}${s?":"+String(s).padStart(2,"0"):""}`}
+function read(){let h=Number($("hh").value),m=Number($("mm").value),s=Number($("ss").value||0);if(!Number.isInteger(h)||h<0||h>23||!Number.isInteger(m)||m<0||m>59||!Number.isInteger(s)||s<0||s>59)return null;return h*60+m+s/60}
+function setTime(t){t=((t%1440)+1440)%1440;$("hh").value=String(Math.floor(t/60)).padStart(2,"0");$("mm").value=String(Math.floor(t%60)).padStart(2,"0");$("ss").value=String(Math.round((t-Math.floor(t))*60)%60).padStart(2,"0")}
+function add(n){let t=read();if(t==null)t=300;setTime(t+n)}
+function scenarioTimes(totalHours){return zones.map((z,i)=>fmt(300+(totalHours*60)*(z[1]/100.61)))}
+function renderTable(){
+$("table").innerHTML=zones.map((z,i)=>{let r=real[i];let cls="badge";if(r)cls+=" "+(r>mins(z[3])?"late":"ahead");return `<div class="row"><div><b>${z[0]}</b><div class="muted">${z[1].toFixed(1)} km · límite ${z[3]}</div></div><span class="${cls}">${r==null?"—":fmt(r)}</span></div>`}).join("");
 }
-
-async function initTripPeople(t,selectedPetIds=null,selectedTravelerIds=null){
-  const petTrip=isPetTrip(t);
-  let existing=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=*,person:bloomtrip_people(id,name,kind,emoji)&order=person_id");
-  const existingTravelerIds=existing.filter(tp=>tp.person?.kind==="traveler").map(tp=>Number(tp.person_id));
-  const travelers=selectedTravelerIds===null?(t._isNew?people.filter(p=>p.kind==="traveler").slice(0,2):people.filter(p=>p.kind==="traveler"&&existingTravelerIds.includes(Number(p.id)))):people.filter(p=>p.kind==="traveler"&&selectedTravelerIds.includes(Number(p.id)));
-  const ids=selectedPetIds===null?[...new Set(existing.filter(tp=>tp.person?.kind==="pet").map(tp=>Number(tp.person_id)))]:selectedPetIds.map(Number);
-  const wanted=travelers.concat(petTrip?people.filter(p=>p.kind==="pet"&&ids.includes(Number(p.id))):[]);
-  const wantedIds=new Set(wanted.map(p=>Number(p.id)));
-  const tripItemIds=[...(await api("bloomtrip_trip_items?trip_id=eq."+t.id+"&select=id").catch(()=>[])).map(x=>Number(x.id)).filter(Number.isFinite)];
-  const removedPeople=existing.filter(tp=>!wantedIds.has(Number(tp.person_id)));
-  if(removedPeople.length){
-    const removedIds=[...new Set(removedPeople.map(tp=>Number(tp.person_id)).filter(Number.isFinite))];
-    if(tripItemIds.length&&removedIds.length) await api("bloomtrip_trip_item_people?trip_item_id=in.("+tripItemIds.join(',')+")&person_id=in.("+removedIds.join(',')+")",{method:"DELETE"}).catch(()=>{});
-    await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&person_id=in.("+removedIds.join(',')+")",{method:"DELETE"}).catch(()=>{});
-  }
-  existing=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=*,person:bloomtrip_people(id,name,kind,emoji)&order=person_id");
-  const existingIds=new Set(existing.map(x=>Number(x.person_id)));
-  const missing=wanted.filter(p=>!existingIds.has(Number(p.id)));
-  if(missing.length) await api("bloomtrip_trip_people",{method:"POST",body:JSON.stringify(missing.map(p=>({trip_id:t.id,person_id:p.id,display_name:p.name})))});
-  existing=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=*,person:bloomtrip_people(id,name,kind,emoji)&order=person_id");
-  tripPeople=existing.filter(tp=>wantedIds.has(Number(tp.person_id)));
+function renderSummary(){
+let keys=Object.keys(real).map(Number).sort((a,b)=>b-a);
+if(!keys.length){$("finish").textContent=base16[9];$("finishSub").textContent="Escenario personalizado de 16 h · límite 22:59";$("lastPoint").textContent="Salida";$("lastTime").textContent="05:00";$("pace").textContent="—";$("paceSub").textContent="Sin paso real";$("limitDiff").textContent="−1 h 59 min";$("limitText").textContent="Previsión dentro del límite";return}
+let i=keys[0],t=real[i],km=zones[i][1],elapsed=t-300,pace=elapsed/km,finish=300+pace*100.61,diff=1079-finish;
+$("finish").textContent=fmt(finish);$("finishSub").textContent="Previsión según el último paso real · límite 22:59";$("lastPoint").textContent=zones[i][0];$("lastTime").textContent=fmt(t);$("pace").textContent=pace.toFixed(2)+" min/km";$("paceSub").textContent=(60/pace).toFixed(2)+" km/h de media";
+let sign=diff>=0?"−":"+";
+let ad=Math.abs(Math.round(diff));let h=Math.floor(ad/60),m=ad%60;$("limitDiff").textContent=`${sign}${h} h ${String(m).padStart(2,"0")} min`;$("limitText").textContent=diff>=0?"Previsión dentro del límite":"Previsión fuera del límite";
 }
-
-async function syncPetLinks(t){if(!isPetTrip(t))return;const tps=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=person_id,person:bloomtrip_people(id,name,kind)");const pets=tps.filter(tp=>tp.person?.kind==="pet");if(!pets.length)return;const tripItems=await api("bloomtrip_trip_items?trip_id=eq."+t.id+"&select=id,general_item_id,categoria");const petItems=tripItems.filter(x=>x.categoria==="Mascota");if(!petItems.length)return;const gids=[...new Set(petItems.map(x=>x.general_item_id).filter(Boolean))];let generals=[];if(gids.length)generals=await api("bloomtrip_general_items?id=in.("+gids.join(",")+")&select=id,pet_targets").catch(()=>[]);const gm=new Map(generals.map(g=>[g.id,g]));const existing=await api("bloomtrip_trip_item_people?select=trip_item_id,person_id").catch(()=>[]);const have=new Set(existing.filter(x=>petItems.some(i=>i.id===x.trip_item_id)).map(x=>x.trip_item_id+":"+x.person_id));const missing=[];for(const item of petItems){const targets=(gm.get(item.general_item_id)?.pet_targets||[]).map(v=>String(v).toLowerCase());for(const tp of pets){let applies=!targets.length;const pname=String(tp.person?.name||"").toLowerCase();const kind=String(tp.person?.kind||"").toLowerCase();if(targets.length){applies=targets.includes(pname)||targets.includes(kind)||(targets.includes("gato")&&targets.includes("perro")&&pname!=="gato"&&pname!=="perro")}if(applies&&!have.has(item.id+":"+tp.person_id))missing.push({trip_item_id:item.id,person_id:tp.person_id,done:false})}}if(missing.length)await postTripItemPeople(missing)}
-async function openTrip(t){currentTrip=t;currentPerson=null;await initTripPeople(t);await syncPetLinks(t);$("home").classList.add("hidden");$("general").classList.add("hidden");$("detail").classList.remove("hidden");$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");$("tripTitle").textContent=t.name;$("tripMeta").textContent=tripMeta(t);renderProfiles();renderRunningPanel();resolveWeather(t)}
-async function renderProfiles(){const all=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);const links=await api("bloomtrip_trip_item_people?select=trip_item_id,person_id").catch(()=>[]);const generalIds=[...new Set(all.map(x=>x.general_item_id).filter(Boolean))];let generals=[];if(generalIds.length)generals=await api("bloomtrip_general_items?id=in.("+generalIds.join(",")+")&select=id,categoria,pet_targets").catch(()=>[]);const gm=new Map(generals.map(g=>[g.id,g]));$("profiles").innerHTML="";tripPeople.forEach(tp=>{const linked=new Set(links.filter(l=>l.person_id===tp.person_id).map(l=>l.trip_item_id));const count=all.filter(x=>linked.has(x.id)||legacyAppliesToPerson(x,tp,gm.get(x.general_item_id))).length;const p=tp.person||{};const d=document.createElement("div");d.className="profile";d.innerHTML='<div class="avatar">'+esc(p.emoji||"👤")+'</div><b>'+esc(tp.display_name)+'</b><div class="pct">'+count+' artículo'+(count===1?'':'s')+'</div>';d.onclick=()=>openPerson(tp);$("profiles").append(d)})}
-
-function isRunningTrip(){
-  return (currentTrip?._modules||[]).some(m=>String(m.name||"").toLowerCase()==="running");
+function renderSimulation(){
+let h=Number($("scenario").value),times=scenarioTimes(h);$("simFinish").value=times[9];
+$("simTable").innerHTML=zones.map((z,i)=>`<div class="row"><div><b>${z[0]}</b><div class="muted">${z[1].toFixed(1)} km · límite ${z[3]}</div></div><span class="badge">${times[i]}</span></div>`).join("");
 }
-function isRaceSpecificItem(gi){
-  if(!gi)return false;
-  const text=(String(gi.articulo||"")+" "+String(gi.notas||"")).toLowerCase();
-  const keywords=["dorsal","imperdible","chip","carrera","running","trail","gel","barrita","electrolit","isotón","soft flask","frontal","luz roja","manta térmica","chubasquero","gafas de sol running","reloj gps","sensor de running","cinta / banda de pecho","bastones","calcetines técnicos","shorts / pantalón de correr","camiseta de carrera","chaleco / mochila de hidratación","riñonera / cinturón running","vaselina","compeed","tiritas","protector solar","botiquín básico post-carrera","track de la carrera","material obligatorio","avituallamiento","mochilas de repuesto"];
-  return keywords.some(k=>text.includes(k));
-}
-async function renderRunningPanel(){
-  const panel=$("runningPanel"); if(!panel)return;
-  if(!isRunningTrip()){panel.classList.add("hidden");return;}
-  panel.classList.remove("hidden");
-  const raceBox=$("raceChecklist"), bagsBox=$("runningBags");
-  raceBox.innerHTML='<div class="empty">Cargando checklist de carrera…</div>';
-  const gis=await api("bloomtrip_general_items?active=eq.true&select=id,articulo,categoria,subcategoria,prioridad,notas,phase&order=articulo.asc").catch(()=>[]);
-  const links=await api("bloomtrip_general_item_modules?module_id=eq.14&select=general_item_id").catch(()=>[]);
-  const linked=new Set(links.map(x=>Number(x.general_item_id)));
-  const raceItems=gis.filter(g=>linked.has(Number(g.id))&&isRaceSpecificItem(g));
-  const tripItems=await api("bloomtrip_trip_items?trip_id=eq."+currentTrip.id+"&select=id,general_item_id,articulo,prioridad,notas,done&order=id.asc").catch(()=>[]);
-  const tripByGeneral=new Map(tripItems.filter(x=>x.general_item_id).map(x=>[Number(x.general_item_id),x]));
-  raceBox.innerHTML=raceItems.length?"":"<div class=\"empty\">No hay material específico de carrera configurado.</div>";
-  raceItems.forEach(g=>{
-    const x=tripByGeneral.get(Number(g.id));
-    const row=document.createElement("label");row.className="race-check";
-    row.innerHTML='<input type="checkbox" '+(x?.done?'checked':'')+' '+(!x?'disabled':'')+'><div style="flex:1"><div class="name">'+esc(g.articulo)+'</div><div class="meta">'+esc(g.prioridad||"")+(g.notas?" · 📝 "+esc(g.notas):"")+'</div></div>';
-    const cb=row.querySelector("input");if(x)cb.onchange=async()=>{await api("bloomtrip_trip_items?id=eq."+x.id,{method:"PATCH",body:JSON.stringify({done:cb.checked,updated_at:new Date().toISOString()})});};
-    raceBox.append(row);
-  });
-  await renderRunningBags();
-}
-async function renderRunningBags(){
-  const box=$("runningBags");if(!box||!currentTrip)return;
-  const bags=await api("bloomtrip_running_bags?trip_id=eq."+currentTrip.id+"&active=eq.true&order=sort_order.asc,id.asc").catch(()=>[]);
-  box.innerHTML=bags.length?"":"<div class=\"empty\">Todavía no hay mochilas de repuesto. Añade la primera cuando quieras.</div>";
-  for(const bag of bags){
-    const items=await api("bloomtrip_running_bag_items?bag_id=eq."+bag.id+"&order=sort_order.asc,id.asc").catch(()=>[]);
-    const d=document.createElement("div");d.className="bag-card";
-    d.innerHTML='<div class="bag-head"><div><div class="bag-title">🎒 '+esc(bag.name)+'</div>'+(bag.location?'<div class="bag-location">📍 '+esc(bag.location)+'</div>':"")+'</div><div class="actions"><button data-edit>✏️ Editar</button><button class="danger" data-del>🗑️ Eliminar</button></div></div><div class="bag-items">'+(items.length?items.map(x=>'<label class="bag-item"><input type="checkbox" data-bagcheck '+(x.done?'checked':'')+'><span style="flex:1">'+esc(x.articulo)+(x.unidades>1?' ×'+x.unidades:"")+'</span></label>').join(""):'<div class="empty">Mochila vacía.</div>')+'</div><div class="bag-actions"><button class="primary" data-additem>➕ Añadir contenido</button></div>';
-    d.querySelector("[data-edit]").onclick=()=>runningBagForm(bag);
-    d.querySelector("[data-del]").onclick=async()=>{if(!confirm('¿Eliminar la mochila "'+bag.name+'"?'))return;await api("bloomtrip_running_bags?id=eq."+bag.id,{method:"DELETE"});await renderRunningBags();};
-    d.querySelectorAll("[data-bagcheck]").forEach((cb,i)=>cb.onchange=async()=>{if(items[i])await api("bloomtrip_running_bag_items?id=eq."+items[i].id,{method:"PATCH",body:JSON.stringify({done:cb.checked,updated_at:new Date().toISOString()})})});
-    d.querySelector("[data-additem]").onclick=()=>runningBagItemForm(bag);
-    box.append(d);
-  }
-}
-function runningBagForm(bag=null){
-  openModal('<h2>🎒 '+(bag?"Editar mochila":"Nueva mochila")+'</h2><div class="formgrid"><div class="field full"><label>Nombre *</label><input id="bagName" value="'+esc(bag?.name||"")+'" placeholder="Ej. Mochila Cercedilla"></div><div class="field full"><label>Ubicación</label><input id="bagLocation" value="'+esc(bag?.location||"")+'" placeholder="Ej. Cercedilla · km 50"></div></div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
-  $("cancel").onclick=closeModal;$("save").onclick=async()=>{const name=$("bagName").value.trim();if(!name){alert("El nombre es obligatorio.");return}const body={name,location:$("bagLocation").value.trim()||null,updated_at:new Date().toISOString()};if(bag)await api("bloomtrip_running_bags?id=eq."+bag.id,{method:"PATCH",body:JSON.stringify(body)});else {const existing=await api("bloomtrip_running_bags?trip_id=eq."+currentTrip.id+"&select=sort_order&order=sort_order.desc&limit=1").catch(()=>[]);body.trip_id=currentTrip.id;body.sort_order=(existing[0]?.sort_order||0)+1;await api("bloomtrip_running_bags",{method:"POST",body:JSON.stringify(body)})}closeModal();await renderRunningBags();};
-}
-function runningBagItemForm(bag){
-  openModal('<h2>➕ Contenido de '+esc(bag.name)+'</h2><div class="formgrid"><div class="field full"><label>Artículo *</label><input id="bagItemName" placeholder="Ej. Camiseta de repuesto"></div><div class="field"><label>Unidades</label><input id="bagItemUnits" type="number" min="1" value="1"></div><div class="field"><label>Prioridad</label><select id="bagItemPriority"><option>Recomendado</option><option>Imprescindible</option><option>Opcional</option></select></div><div class="field full"><label>Notas</label><textarea id="bagItemNotes"></textarea></div></div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
-  $("cancel").onclick=closeModal;$("save").onclick=async()=>{const articulo=$("bagItemName").value.trim();if(!articulo){alert("El artículo es obligatorio.");return}await api("bloomtrip_running_bag_items",{method:"POST",body:JSON.stringify({bag_id:bag.id,articulo,unidades:Number($("bagItemUnits").value)||1,prioridad:$("bagItemPriority").value,notas:$("bagItemNotes").value.trim()||null,done:false})});closeModal();await renderRunningBags();};
-}
-async function collectSelectedPets(){
-  const ids=[...document.querySelectorAll('[data-pet]:checked')].map(x=>Number(x.value)).filter(Boolean);
-  const newNames=[...document.querySelectorAll('[data-newpet]')].map(x=>x.value.trim()).filter(Boolean);
-  for(const petName of newNames){
-    const created=await api('bloomtrip_people',{method:'POST',body:JSON.stringify({name:petName,kind:'pet',emoji:'🐾',active:true,is_default:false})});
-    if(created?.[0]){people.push(created[0]);ids.push(Number(created[0].id));}
-  }
-  return [...new Set(ids)];
-}
-
-async function tripForm(t=null){
-  let currentTravelerIds=new Set();
-  if(t){const rows=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=person_id,person:bloomtrip_people(id,name,kind,emoji,is_default)").catch(()=>[]);rows.filter(r=>r.person?.kind==="traveler").forEach(r=>{currentTravelerIds.add(Number(r.person_id));if(!people.some(p=>Number(p.id)===Number(r.person_id))&&r.person)people.push(r.person);});rows.filter(r=>r.person?.kind==="pet").forEach(r=>{if(!people.some(p=>Number(p.id)===Number(r.person_id))&&r.person)people.push(r.person);});}
-  const chosen=new Set((t?._modules||[]).map(m=>Number(m.id)));
-  const petModuleId=getPetModuleId();
-  const travelerExistingIds=t?[...currentTravelerIds]:[1,2];
-  const modChecks=modules.map(m=>'<label><input type="checkbox" value="'+m.id+'" '+(chosen.has(Number(m.id))?"checked":"")+' data-mod> '+esc(m.emoji||"")+" "+esc(m.name)+'</label>').join("");
-  const cond=['Calor','Templado','Frío','Lluvia','Nieve/hielo','Variable'].map(x=>'<label><input type="checkbox" value="'+x+'" '+((t?.climate_conditions||[]).includes(x)?"checked":"")+' data-climate> '+x+'</label>').join("");
-  const travelers=people.filter(p=>p.kind==='traveler'&&(p.is_default!==false||currentTravelerIds.has(Number(p.id))));
-  const travelerChecks=travelers.map(p=>'<label><input type="checkbox" value="'+p.id+'" '+(travelerExistingIds.includes(Number(p.id))?"checked":"")+' data-traveler> '+esc(p.emoji||"🧳")+' '+esc(p.name)+'</label>').join("");
-  openModal('<h2>'+ (t?"Editar viaje":"Nuevo viaje")+'</h2><div class="formgrid"><div class="field full"><label>Nombre *</label><input id="fName" value="'+esc(t?.name||"")+'"></div><div class="field"><label>Destino</label><input id="fDest" value="'+esc(t?.destination||"")+'"></div><div class="field"><label>Fecha de inicio</label><input id="fStart" type="date" value="'+(t?.start_date||"")+'"></div><div class="field"><label>Fecha de fin</label><input id="fEnd" type="date" value="'+(t?.end_date||"")+'"></div><div class="field"><label>Estación</label><select id="fSeason"><option value="">Sin indicar</option>'+['Primavera','Verano','Otoño','Invierno'].map(x=>'<option '+(t?.season===x?"selected":"")+'>'+x+'</option>').join('')+'</select></div><div class="field full"><label>Condiciones esperadas</label><div class="checks">'+cond+'</div></div><div class="field full"><label>Transporte y módulos</label><div class="checks">'+modChecks+'</div><div class="hint">Los artículos generales asociados a un módulo se incorporarán o retirarán al guardar el viaje.</div></div><div class="field full"><label>👥 Viajeros que viajan</label><div class="checks" id="travelerChooser">'+travelerChecks+'</div><div class="toolbar"><button type="button" id="addTraveler">＋ Añadir viajero</button></div><div id="newTravelers"></div><div class="hint">Puedes viajar solo, en pareja o añadir hijos y otros viajeros.</div></div><div class="field full" id="petChooser" style="display:none"><label>🐾 Mascotas que viajan</label><div class="checks">'+people.filter(p=>p.kind==="pet").map(p=>'<label><input type="checkbox" value="'+p.id+'" data-pet> '+esc(p.emoji||"🐾")+' '+esc(p.name)+'</label>').join("")+'</div><div class="toolbar"><button type="button" id="addPet">＋ Añadir otra mascota</button></div><div id="newPets"></div><div class="hint">Elige qué mascotas viajan. Puedes añadir otra especie, por ejemplo Conejo.</div></div><div class="field full"><label>👥 Nombres de este viaje</label><div id="tripNames" class="formgrid"></div><div class="hint">Puedes cambiar los nombres solo para este viaje.</div></div><div class="field full"><label>Notas</label><textarea id="fNotes">'+esc(t?.notes||"")+'</textarea></div></div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');
-  const syncTravelerNameInputs=async()=>{
-    const box=$("tripNames"); if(!box)return; box.innerHTML="";
-    const selected=[...document.querySelectorAll('[data-traveler]:checked')].map(c=>Number(c.value));
-    const existingRows=t?await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&person_id=in.("+(selected.join(',')||'0')+")&select=person_id,display_name").catch(()=>[]):[];
-    const map=new Map(existingRows.map(r=>[Number(r.person_id),r.display_name]));
-    selected.forEach(id=>{const p=people.find(x=>Number(x.id)===id);const f=document.createElement('div');f.className='field';f.innerHTML='<label>'+esc(p?.emoji||'🧳')+' '+esc(p?.name||'Viajero')+'</label><input id="name'+id+'" value="'+esc(map.get(id)||p?.name||'Viajero')+'">';box.append(f)});
-    [...document.querySelectorAll('[data-newtraveler]')].forEach((el,i)=>{const f=document.createElement('div');f.className='field';f.innerHTML='<label>🧳 Nuevo viajero</label><input data-newtravelername value="'+esc(el.value||'')+'">';box.append(f)});
-  };
-  if(t){
-    api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=person_id,display_name,person:bloomtrip_people(id,name,kind)").then(rows=>{rows.filter(r=>r.person?.kind==='traveler').forEach(r=>{const c=document.querySelector('[data-traveler][value="'+r.person_id+'"]');if(c)c.checked=true});syncTravelerNameInputs()}).catch(()=>{});
-  }else syncTravelerNameInputs();
-  const refreshPetUI=async()=>{const on=[...document.querySelectorAll('[data-mod]:checked')].some(el=>Number(el.value)===Number(petModuleId));$("petChooser").style.display=on?"":"none";if(on&&t){const rows=await api("bloomtrip_trip_people?trip_id=eq."+t.id+"&select=person_id,display_name,person:bloomtrip_people(id,name,kind,emoji)").catch(()=>[]);document.querySelectorAll('[data-pet]').forEach(c=>c.checked=rows.some(r=>Number(r.person_id)===Number(c.value)));}};
-  document.querySelectorAll('[data-mod]').forEach(el=>el.addEventListener('change',()=>{refreshPetUI()}));refreshPetUI();
-  document.querySelectorAll('[data-traveler]').forEach(el=>el.addEventListener('change',syncTravelerNameInputs));
-  $("addTraveler").onclick=()=>{const d=document.createElement('div');d.className='field newTravelerRow';d.innerHTML='<label>🧳 Nuevo viajero</label><input data-newtraveler placeholder="Ej.: Lucía, Pablo...">';$("newTravelers").append(d);d.querySelector('input').focus();d.querySelector('input').addEventListener('input',syncTravelerNameInputs)};
-  $("addPet").onclick=()=>{const d=document.createElement('div');d.className='field newPetRow';d.innerHTML='<label>🐾 Nueva mascota</label><input data-newpet placeholder="Ej.: Conejo, Hurón, Pájaro...">';$("newPets").append(d);d.querySelector('input').focus()};
-  $("cancel").onclick=closeModal;
-  $("save").onclick=async()=>{try{
-    const name=$("fName").value.trim();if(!name)throw Error("El nombre es obligatorio.");if($("fStart").value&&$("fEnd").value&&$("fEnd").value<$("fStart").value)throw Error("La fecha de fin no puede ser anterior a la fecha de inicio.");
-    const selected=[...document.querySelectorAll('[data-mod]:checked')].map(x=>Number(x.value));const climates=[...document.querySelectorAll('[data-climate]:checked')].map(x=>x.value);const effectiveModules=effectiveModuleIds(selected,climates);const petTrip=isPetTripByModules(selected);
-    const newTravelerNames=[...document.querySelectorAll('[data-newtraveler]')].map(x=>x.value.trim()).filter(Boolean);const travelerIds=[...document.querySelectorAll('[data-traveler]:checked')].map(x=>Number(x.value));
-    for(const travelerName of newTravelerNames){const created=await api('bloomtrip_people',{method:'POST',body:JSON.stringify({name:travelerName,kind:'traveler',emoji:'🧳',active:true,is_default:false})});if(created?.[0]){people.push(created[0]);travelerIds.push(Number(created[0].id));}}
-    if(!travelerIds.length)throw Error('Selecciona al menos un viajero.');
-    const selectedPetIds=petTrip?await collectSelectedPets():[];
-    const destination=$("fDest").value.trim()||null;const destinationChanged=!!t&&destination!==(t.destination||null);const body={name,destination,start_date:$("fStart").value||null,end_date:$("fEnd").value||null,season:$("fSeason").value||null,climate_conditions:climates,notes:$("fNotes").value.trim()||null,updated_at:new Date().toISOString()};if(destinationChanged)Object.assign(body,{weather_latitude:null,weather_longitude:null,weather_location:null,weather_country:null,weather_timezone:null,weather_data:null,weather_updated_at:null});let nt;
-    if(t){await api('bloomtrip_trips?id=eq.'+t.id,{method:'PATCH',body:JSON.stringify(body)});await api('bloomtrip_trip_modules?trip_id=eq.'+t.id,{method:'DELETE'});if(selected.length)await api('bloomtrip_trip_modules',{method:'POST',body:JSON.stringify(selected.map(module_id=>({trip_id:t.id,module_id})))});nt={...t,...body,_modules:modules.filter(m=>selected.includes(Number(m.id)))};await initTripPeople(nt,petTrip?selectedPetIds:[],travelerIds);await syncPetLinks(nt);await saveTripNames(t.id);await savePetDisplayNames(t.id);await addGeneralItemsToTrip(t.id,effectiveModules);await ensureTripAssignments(t.id);closeModal();await renderTrips();await openTrip(nt);
-    }else{body.status='active';body.is_template=false;const created=await api('bloomtrip_trips',{method:'POST',body:JSON.stringify(body)});nt=created?.[0];if(!nt)throw Error('El viaje se creó pero no se pudo recuperar su información.');nt._modules=modules.filter(m=>selected.includes(Number(m.id)));nt._isNew=true;if(selected.length)await api('bloomtrip_trip_modules',{method:'POST',body:JSON.stringify(selected.map(module_id=>({trip_id:nt.id,module_id})))});await initTripPeople(nt,petTrip?selectedPetIds:[],travelerIds);await saveTripNames(nt.id);await savePetDisplayNames(nt.id);await cloneGeneralToTrip(nt.id,selected,climates);await ensureTripAssignments(nt.id);closeModal();await renderTrips();await openTrip(nt);}
-  }catch(e){console.error(e);alert('No se pudo guardar el viaje.\n\n'+e.message)}};
-}
-
-async function saveTripNames(tripId){for(const el of document.querySelectorAll('[id^="name"]')){const m=el.id.match(/^name(\d+)$/);if(!m)continue;const n=el.value.trim();if(n)await api('bloomtrip_trip_people?trip_id=eq.'+tripId+'&person_id=eq.'+m[1],{method:'PATCH',body:JSON.stringify({display_name:n})}).catch(()=>{})}}
-
-async function savePetDisplayNames(tripId){for(const el of document.querySelectorAll("[data-petname]")){const n=el.value.trim();if(n)await api("bloomtrip_trip_people?trip_id=eq."+tripId+"&person_id=eq."+el.dataset.petname,{method:"PATCH",body:JSON.stringify({display_name:n})})}}
-
-async function ensureTripAssignments(tripId){
-  const tps=await api('bloomtrip_trip_people?trip_id=eq.'+tripId+'&select=person_id,person:bloomtrip_people(id,name,kind,emoji)').catch(()=>[]);
-  const its=await api('bloomtrip_trip_items?trip_id=eq.'+tripId+'&select=id,general_item_id,categoria').catch(()=>[]);
-  if(!tps.length||!its.length)return;
-  const gids=[...new Set(its.map(x=>x.general_item_id).filter(Boolean))];let gs=[];if(gids.length)gs=await api('bloomtrip_general_items?id=in.('+gids.join(',')+')&select=id,categoria,pet_targets').catch(()=>[]);const gm=new Map(gs.map(g=>[g.id,g]));
-  const links=await api('bloomtrip_trip_item_people?select=trip_item_id,person_id').catch(()=>[]);const have=new Set(links.map(l=>l.trip_item_id+':'+l.person_id));const missing=[];
-  for(const item of its){const g=gm.get(item.general_item_id);for(const tp of tps){const pet=tp.person?.kind==='pet';let applies;if((g?.categoria||item.categoria)==='Mascota'){if(!pet)continue;const targets=(g?.pet_targets||[]).map(v=>String(v).toLowerCase());if(!targets.length)applies=true;else {const pname=String(tp.person?.name||'').toLowerCase();const kind=String(tp.person?.kind||'').toLowerCase();applies=targets.includes(pname)||targets.includes(kind)||(targets.includes('gato')&&targets.includes('perro')&&pname!=='gato'&&pname!=='perro');}}else applies=!pet;if(applies&&!have.has(item.id+':'+tp.person_id))missing.push({trip_item_id:item.id,person_id:tp.person_id,done:false});}}
-  if(missing.length)await postTripItemPeople(missing);
-}
-function weatherModuleIds(rows){const names=new Set();for(const r of rows){if(Number.isFinite(r.max)&&r.max>=28)names.add('calor');if(Number.isFinite(r.min)&&r.min<=12)names.add('frío');if(Number.isFinite(r.rain)&&r.rain>=40)names.add('lluvia');if([71,73,75,77,85,86].includes(Number(r.code)))names.add('nieve/hielo')}return modules.filter(m=>names.has(String(m.name||'').toLowerCase())).map(m=>Number(m.id))}
-async function resolveWeather(t,force=false){
-  const card=$("weatherCard");if(!card)return;
-  if(!t.destination){card.classList.add('hidden');return;}
-  card.classList.remove('hidden');card.innerHTML='<b>🌤️ Tiempo del destino</b><div class="hint">Buscando la ubicación de '+esc(t.destination)+'...</div>';
-  try{
-    let loc=t.weather_latitude&&t.weather_longitude?{latitude:t.weather_latitude,longitude:t.weather_longitude,name:t.weather_location||t.destination,country:t.weather_country||''}:null;
-    if(!loc){const g=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(t.destination)+'&count=1&language=es&format=json').then(r=>r.json());loc=g.results?.[0];if(!loc)throw Error('No he encontrado esa localidad.');await api('bloomtrip_trips?id=eq.'+t.id,{method:'PATCH',body:JSON.stringify({weather_latitude:loc.latitude,weather_longitude:loc.longitude,weather_location:loc.name,weather_country:loc.country||null,weather_timezone:loc.timezone||null,updated_at:new Date().toISOString()})});Object.assign(t,{weather_latitude:loc.latitude,weather_longitude:loc.longitude,weather_location:loc.name,weather_country:loc.country||null,weather_timezone:loc.timezone||null});}
-    const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(loc.latitude)+'&longitude='+encodeURIComponent(loc.longitude)+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16';
-    const data=await fetch(url).then(r=>r.json());const start=t.start_date,end=t.end_date||t.start_date;const rows=(data.daily?.time||[]).map((d,i)=>({date:d,max:data.daily.temperature_2m_max[i],min:data.daily.temperature_2m_min[i],rain:data.daily.precipitation_probability_max?.[i]??null,code:data.daily.weather_code?.[i]})).filter(r=>!start||r.date>=start&&(!end||r.date<=end));
-    const weatherJson={fetched_at:new Date().toISOString(),daily:rows,location:loc};await api('bloomtrip_trips?id=eq.'+t.id,{method:'PATCH',body:JSON.stringify({weather_data:weatherJson,weather_updated_at:new Date().toISOString(),updated_at:new Date().toISOString()})});const weatherMods=weatherModuleIds(rows);if(weatherMods.length){const manual=(t._modules||[]).map(m=>Number(m.id));const climate=effectiveModuleIds(manual,t.climate_conditions||[]);await addGeneralItemsToTrip(t.id,[...new Set([...climate,...weatherMods])],false);await ensureTripAssignments(t.id);await initTripPeople(t);await syncPetLinks(t);renderProfiles();}
-    const first=rows[0],last=rows[rows.length-1];let html='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b>🌤️ '+esc(loc.name)+(loc.country?', '+esc(loc.country):'')+'</b><div class="hint">Previsión actualizada '+new Date().toLocaleString('es-ES')+'</div></div><button id="refreshWeather">↻ Actualizar</button></div>';
-    if(rows.length)html+='<div class="meta" style="margin-top:10px">'+rows.map(r=>fmtWeatherRow(r)).join('')+'</div>';else html+='<div class="hint" style="margin-top:10px">La previsión detallada todavía no está disponible para las fechas del viaje. Open-Meteo ofrece previsiones de hasta 16 días; puedes actualizarla cuando se acerque la fecha.</div>';
-    card.innerHTML=html;$("refreshWeather").onclick=()=>resolveWeather(t,true);
-  }catch(e){card.innerHTML='<b>🌤️ Tiempo del destino</b><div class="hint">No se ha podido actualizar ahora. Puedes volver a intentarlo.</div><button id="refreshWeather">↻ Reintentar</button>';$("refreshWeather").onclick=()=>resolveWeather(t,true)}
-}
-function fmtWeatherRow(r){const icons={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌧️',82:'🌧️',95:'⛈️',96:'⛈️',99:'⛈️'};return '<div style="padding:6px 0;border-bottom:1px solid var(--line)">'+esc(new Date(r.date+'T00:00:00').toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}))+' · '+(icons[r.code]||'🌡️')+' '+r.min+'–'+r.max+' °C'+(r.rain!=null?' · 💧 '+r.rain+'%':'')+'</div>'}
-function effectiveModuleIds(selected,climates=[]){const ids=new Set(selected.map(Number));const climateNames=new Set(climates.map(x=>String(x).toLowerCase()));modules.filter(m=>climateNames.has(String(m.name||"").toLowerCase())).forEach(m=>ids.add(Number(m.id)));return [...ids]}
-async function addGeneralItemsToTrip(tripId,moduleIds,removeStale=true){
-  const all=await api("bloomtrip_general_items?active=eq.true&select=*");
-  const tripPeopleRows=await api("bloomtrip_trip_people?trip_id=eq."+tripId+"&select=*,person:bloomtrip_people(id,name,kind,emoji)");
-  const petTrip=isPetTripByModules(moduleIds);
-  const hasPets=tripPeopleRows.some(tp=>tp.person?.kind==="pet");
-  const generalIds=all.map(g=>g.id);
-  let moduleLinks=[];
-  if(generalIds.length)moduleLinks=await api("bloomtrip_general_item_modules?general_item_id=in.("+generalIds.join(",")+")&select=general_item_id,module_id").catch(()=>[]);
-  const byGeneral=new Map();
-  moduleLinks.forEach(l=>{const a=byGeneral.get(l.general_item_id)||[];a.push(Number(l.module_id));byGeneral.set(l.general_item_id,a)});
-  const existing=await api("bloomtrip_trip_items?trip_id=eq."+tripId+"&select=id,general_item_id").catch(()=>[]);
-  const existingGeneral=new Set(existing.map(x=>x.general_item_id).filter(Boolean));
-  const stale=existing.filter(x=>x.general_item_id).filter(x=>{
-    const gi=all.find(g=>g.id===x.general_item_id); if(!gi)return false;
-    const glinks=byGeneral.get(gi.id)||[];
-    if(gi.categoria==="Mascota"&&(!petTrip||!hasPets))return true;
-    if(glinks.length&&!glinks.some(id=>moduleIds.includes(id)))return true;
-    return false;
-  });
-  for(const x of (removeStale?stale:[])){
-    await api("bloomtrip_trip_item_people?trip_item_id=eq."+x.id,{method:"DELETE"}).catch(()=>{});
-    await api("bloomtrip_trip_items?id=eq."+x.id,{method:"DELETE"}).catch(()=>{});
-    existingGeneral.delete(x.general_item_id);
-  }
-  const chosen=all.filter(gi=>{
-    if(existingGeneral.has(gi.id))return false;
-    const links=byGeneral.get(gi.id)||[];
-    if(links.length&&!links.some(id=>moduleIds.includes(id)))return false;
-    if(gi.categoria==="Mascota"&&(!petTrip||!hasPets))return false;
-    return true;
-  });
-  if(!chosen.length)return;
-  const now=new Date().toISOString();
-  const rows=chosen.map(gi=>({trip_id:tripId,articulo:gi.articulo,categoria:gi.categoria,subcategoria:gi.subcategoria,unidades:gi.unidades,prioridad:gi.prioridad,donde_llevarlo:gi.donde_llevarlo,notas:gi.notas,assignment_mode:"selected",done:false,item_type:gi.item_type,phase:gi.phase,general_item_id:gi.id,updated_at:now}));
-  const created=await api("bloomtrip_trip_items",{method:"POST",body:JSON.stringify(rows)});
-  const createdByGeneral=new Map((created||[]).map(x=>[x.general_item_id,x]));
-  const links=[];
-  for(const gi of chosen){
-    const item=createdByGeneral.get(gi.id); if(!item)continue;
-    const targets=(gi.pet_targets||[]).map(v=>String(v).toLowerCase());
-    const targetRows=tripPeopleRows.filter(tp=>{
-      const pet=tp.person?.kind==="pet";
-      if(gi.categoria==="Mascota"){
-        if(!pet)return false;
-        if(!targets.length)return true;
-        const pname=String(tp.person?.name||"").toLowerCase();
-        if(targets.includes(pname)||targets.includes(String(tp.person?.kind||"").toLowerCase()))return true;
-        return targets.includes("gato")&&targets.includes("perro")&&pname!=="gato"&&pname!=="perro";
-      }
-      return !pet;
-    });
-    targetRows.forEach(tp=>links.push({trip_item_id:item.id,person_id:tp.person_id,done:false}));
-  }
-  if(links.length)await postTripItemPeople(links);
-}
-async function cloneGeneralToTrip(tripId,selected,climates=[]){await addGeneralItemsToTrip(tripId,effectiveModuleIds(selected,climates))}
-async function deleteTrip(t){if(!confirm('¿Eliminar el viaje "'+t.name+'"?'))return;try{await api("bloomtrip_trips?id=eq."+t.id,{method:"DELETE"});if(currentTrip?.id===t.id)currentTrip=null;await renderTrips()}catch(e){alert("No se pudo eliminar el viaje.\n"+e.message)}}
-async function openPerson(tp){currentPerson=tp;$("profiles").classList.add("hidden");$("personDetail").classList.remove("hidden");$("personTitle").textContent=(tp.person?.emoji||"👤")+" "+tp.display_name;undoStack=[];await renderItems()}
-async function renderItems(){const prevCat=$("cat").value,prevPriority=$("priority").value;items=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);const links=await api("bloomtrip_trip_item_people?select=*");const itemIds=new Set(items.map(x=>x.id));const linkMap=new Map(links.filter(x=>itemIds.has(x.trip_item_id)&&x.person_id===currentPerson.person_id).map(x=>[x.trip_item_id,x]));const generalIds=[...new Set(items.map(x=>x.general_item_id).filter(Boolean))];let generals=[];if(generalIds.length)generals=await api("bloomtrip_general_items?id=in.("+generalIds.join(",")+")&select=id,categoria,pet_targets").catch(()=>[]);const gm=new Map(generals.map(g=>[g.id,g]));const relevant=items.filter(x=>linkMap.has(x.id)||legacyAppliesToPerson(x,currentPerson,gm.get(x.general_item_id))).map(x=>({...x,personDone:x.assignment_mode==="all"?x.done:!!linkMap.get(x.id)?.done}));const t=relevant.length,d=relevant.filter(x=>x.personDone).length,pc=t?Math.round(d/t*100):0;$("total").textContent=t;$("done").textContent=d;$("pending").textContent=t-d;$("pct").textContent=pc+"%";$("bar").style.width=pc+"%";const cats=[...new Set(relevant.map(x=>x.categoria).filter(Boolean))].sort(),pris=[...new Set(relevant.map(x=>x.prioridad).filter(Boolean))].sort();$("cat").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option>'+esc(x)+'</option>').join("");$("priority").innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option>'+esc(x)+'</option>').join("");if(cats.includes(prevCat))$("cat").value=prevCat;if(pris.includes(prevPriority))$("priority").value=prevPriority;const q=$("search").value.toLowerCase(),c=$("cat").value,pr=$("priority").value,st=$("status").value;const shown=relevant.filter(x=>(!q||((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase().includes(q))&&(!c||x.categoria===c)&&(!pr||x.prioridad===pr)&&(!st||(st==="done")===x.personDone)).sort((a,b)=>Number(a.personDone)-Number(b.personDone));$("list").innerHTML=shown.length?"":"<div class=\"empty\">No hay artículos con estos filtros.</div>";shown.forEach(x=>{const row=document.createElement("div");row.className="item"+(x.personDone?" done":"");row.innerHTML='<input type="checkbox" '+(x.personDone?"checked":"")+'><div style="flex:1"><div class="name">'+esc(x.articulo)+'</div><div class="meta">'+esc(x.categoria||"")+(x.subcategoria?" · "+esc(x.subcategoria):"")+(x.donde_llevarlo?" · 📍 "+esc(x.donde_llevarlo):"")+(x.phase?" · "+esc(x.phase):"")+'</div>'+(x.prioridad?'<span class="tag">'+esc(x.prioridad)+'</span>':"")+(x.notas?'<div class="meta">📝 '+esc(x.notas)+'</div>':"")+'</div><div class="actions"><button data-edit>✏️</button><button class="danger" data-del>🗑️</button></div>';row.querySelector("input").onchange=e=>toggleDone(x,e.target.checked);row.querySelector("[data-edit]").onclick=()=>itemForm(x,false);row.querySelector("[data-del]").onclick=()=>deleteItem(x);$("list").append(row)});$("undoBtn").disabled=!undoStack.length}
-async function toggleDone(x,val){
-  undoStack.push({id:x.id,person:currentPerson.person_id,old:x.personDone,mode:x.assignment_mode});
-  try{
-    if(x.assignment_mode==="all")await api("bloomtrip_trip_items?id=eq."+x.id,{method:"PATCH",body:JSON.stringify({done:val,updated_at:new Date().toISOString()})});
-    else await api("bloomtrip_trip_item_people?trip_item_id=eq."+x.id+"&person_id=eq."+currentPerson.person_id,{method:"PATCH",body:JSON.stringify({done:val})});
-    await renderItems();
-  }catch(e){undoStack.pop();alert("No se pudo guardar.")}
-}
-async function undoLast(){
-  if(!undoStack.length)return;
-  const action=undoStack.pop();
-  try{
-    if(action.mode==="all")await api("bloomtrip_trip_items?id=eq."+action.id,{method:"PATCH",body:JSON.stringify({done:action.old,updated_at:new Date().toISOString()})});
-    else await api("bloomtrip_trip_item_people?trip_item_id=eq."+action.id+"&person_id=eq."+action.person,{method:"PATCH",body:JSON.stringify({done:action.old})});
-    await renderItems();
-  }catch(e){undoStack.push(action);alert("No se pudo deshacer el último cambio.")}
-}
-async function deleteItem(x){if(!confirm('¿Eliminar "'+x.articulo+'"?'))return;try{await api("bloomtrip_trip_item_people?trip_item_id=eq."+x.id,{method:"DELETE"});await api("bloomtrip_trip_items?id=eq."+x.id,{method:"DELETE"});await renderItems()}catch(e){alert("No se pudo eliminar.")}}
-function itemFields(x,allowGeneral){const catOptions=categories.map(c=>'<option '+(x?.categoria===c.name?"selected":"")+'>'+esc(c.name)+'</option>').join("");const locOptions=locations.map(l=>'<option '+(x?.donde_llevarlo===l.name?"selected":"")+'>'+esc(l.name)+'</option>').join("");const pets=x?.pet_targets||[];const linkedModules=x?.module_tags||[];const moduleField=allowGeneral?'<div class="field full"><label>Módulos / situaciones en las que se incluye</label><div class="checks">'+modules.map(m=>'<label><input type="checkbox" value="'+m.id+'" data-itemmod '+(linkedModules.map(Number).includes(Number(m.id))?'checked':'')+'> '+esc(m.emoji||'')+' '+esc(m.name)+'</label>').join('')+'</div><div class="hint">Si no marcas ninguno, se considera un artículo general.</div></div>':'';const petField=allowGeneral?'<div class="field full"><label>Perfil mascota (solo si la categoría es Mascota)</label><select id="iPet"><option value="">Común a Gato y Perro</option><option value="gato" '+(pets.length===1&&pets[0]==="gato"?"selected":"")+'>🐱 Solo Gato</option><option value="perro" '+(pets.length===1&&pets[0]==="perro"?"selected":"")+'>🐶 Solo Perro</option><option value="ambos" '+(pets.length===2?"selected":"")+'>🐱🐶 Gato y Perro</option></select></div>':'';return '<div class="formgrid"><div class="field full"><label>Artículo *</label><input id="iName" value="'+esc(x?.articulo||"")+'"></div><div class="field"><label>Categoría</label><select id="iCat"><option value="">Sin categoría</option>'+catOptions+'</select></div><div class="field"><label>Subcategoría</label><input id="iSub" value="'+esc(x?.subcategoria||"")+'"></div><div class="field"><label>Unidades</label><input id="iUnits" value="'+esc(x?.unidades||"")+'"></div><div class="field"><label>Prioridad</label><select id="iPri"><option value="">Sin prioridad</option>'+['Imprescindible','Importante','Recomendado','Opcional'].map(p=>'<option '+(x?.prioridad===p?"selected":"")+'>'+p+'</option>').join('')+'</select></div><div class="field"><label>Dónde llevarlo</label><select id="iLoc"><option value="">Sin indicar</option>'+locOptions+'</select></div><div class="field"><label>Tipo</label><select id="iType">'+['Artículo físico','Digital','Documento / trámite','Tarea'].map(p=>'<option '+(x?.item_type===p?"selected":"")+'>'+p+'</option>').join('')+'</select></div><div class="field"><label>Fase</label><select id="iPhase"><option value="">Sin fase</option>'+['Previo al viaje','Durante el viaje','Mascota en casa'].map(p=>'<option '+(x?.phase===p?"selected":"")+'>'+p+'</option>').join('')+'</select></div><div class="field full"><label>Notas</label><textarea id="iNotes">'+esc(x?.notas||"")+'</textarea></div>'+moduleField+petField+(allowGeneral?'<div class="field full"><label class="checkrow"><input id="addGeneral" type="checkbox"> Añadir también a la lista general de BloomTrip</label><div class="hint">Si ya existe un artículo con el mismo nombre, te avisaré y no se duplicará.</div></div>':"")+'</div>'}
-async function itemForm(x=null,fromGeneral=false){if(fromGeneral&&x){const ml=await api("bloomtrip_general_item_modules?general_item_id=eq."+x.id+"&select=module_id").catch(()=>[]);x={...x,module_tags:ml.map(v=>Number(v.module_id))}}openModal('<h2>'+(x?(fromGeneral?"Editar artículo general":"Editar artículo"):(fromGeneral?"Añadir artículo general":"Añadir artículo"))+'</h2>'+itemFields(x,fromGeneral)+'<div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');$("cancel").onclick=closeModal;$("save").onclick=async()=>{try{const articulo=$("iName").value.trim();if(!articulo)throw Error("El artículo es obligatorio.");const body={articulo,categoria:$("iCat").value||null,subcategoria:$("iSub").value.trim()||null,unidades:$("iUnits").value.trim()||null,prioridad:$("iPri").value||null,donde_llevarlo:$("iLoc").value||null,item_type:$("iType").value,phase:$("iPhase").value||"",notas:$("iNotes").value.trim()||null,updated_at:new Date().toISOString()};if(fromGeneral)body.module_tags=[...document.querySelectorAll('[data-itemmod]:checked')].map(x=>x.value);if(fromGeneral)body.pet_targets=body.categoria==="Mascota"?(( $("iPet")?.value||"")==="gato"?["gato"]:( $("iPet")?.value||"")==="perro"?["perro"]:["gato","perro"]):[];if(fromGeneral){let gid=x?.id;if(x)await api("bloomtrip_general_items?id=eq."+x.id,{method:"PATCH",body:JSON.stringify(body)});else {const createdGeneral=await api("bloomtrip_general_items",{method:"POST",body:JSON.stringify(body)});gid=createdGeneral?.[0]?.id}if(gid){await api("bloomtrip_general_item_modules?general_item_id=eq."+gid,{method:"DELETE"});const mids=[...document.querySelectorAll('[data-itemmod]:checked')].map(e=>Number(e.value));if(mids.length)await api("bloomtrip_general_item_modules",{method:"POST",body:JSON.stringify(mids.map(module_id=>({general_item_id:gid,module_id})))})}}else if(x){await api("bloomtrip_trip_items?id=eq."+x.id,{method:"PATCH",body:JSON.stringify(body)})}else{body.trip_id=currentTrip.id;body.assignment_mode="selected";body.done=false;const created=await api("bloomtrip_trip_items",{method:"POST",body:JSON.stringify(body)});if(created?.[0]){await initTripPeople(currentTrip);const targetRows=tripPeople.filter(tp=>body.categoria==="Mascota"?personIsPet(tp):!personIsPet(tp)).map(tp=>({trip_item_id:created[0].id,person_id:tp.person_id,done:false}));if(targetRows.length)await postTripItemPeople(targetRows)}if($("addGeneral")?.checked){const existing=await api("bloomtrip_general_items?active=eq.true&articulo=ilike."+encodeURIComponent(articulo));if(existing.length)alert("Ese artículo ya existe en la lista general. No se ha duplicado.");else await api("bloomtrip_general_items",{method:"POST",body:JSON.stringify(body)})}}closeModal();fromGeneral?renderGeneral():renderItems()}catch(e){alert("No se pudo guardar el artículo.\n\n"+e.message)}}}
-async function renderGeneral(){const prevCat=$("gCat").value;const data=await api("bloomtrip_general_items?active=eq.true&order=categoria.asc,articulo.asc");const q=$("gSearch").value.toLowerCase(),c=prevCat,tp=$("gType").value,ph=$("gPhase").value;$("gCat").innerHTML='<option value="">Todas las categorías</option>'+[...new Set(data.map(x=>x.categoria).filter(Boolean))].sort().map(x=>'<option>'+esc(x)+'</option>').join("");if([...new Set(data.map(x=>x.categoria))].includes(prevCat))$("gCat").value=prevCat;const shown=data.filter(x=>(!q||((x.articulo||"")+" "+(x.categoria||"")+" "+(x.notas||"")).toLowerCase().includes(q))&&(!c||x.categoria===c)&&(!tp||x.item_type===tp)&&(!ph||x.phase===ph));$("generalList").innerHTML=shown.length?"":"<div class=\"empty\">No hay artículos con estos filtros.</div>";shown.forEach(x=>{const d=document.createElement("div");d.className="item";d.innerHTML='<div style="flex:1"><div class="name">'+esc(x.articulo)+'</div><div class="meta">'+esc(x.categoria||"")+(x.subcategoria?" · "+esc(x.subcategoria):"")+(x.donde_llevarlo?" · 📍 "+esc(x.donde_llevarlo):"")+(x.phase?" · "+esc(x.phase):"")+'</div>'+(x.notas?'<div class="meta">📝 '+esc(x.notas)+'</div>':"")+'</div><div class="actions"><button data-edit>✏️</button><button class="danger" data-del>🗑️</button></div>';d.querySelector("[data-edit]").onclick=()=>itemForm(x,true);d.querySelector("[data-del]").onclick=async()=>{if(!confirm('¿Eliminar "'+x.articulo+'" de la lista general?'))return;await api("bloomtrip_general_items?id=eq."+x.id,{method:"PATCH",body:JSON.stringify({active:false,updated_at:new Date().toISOString()})});renderGeneral()};$("generalList").append(d)})}
-async function editTripPeople(){await initTripPeople(currentTrip);const rows=tripPeople.map(tp=>'<div class="field"><label>'+esc(tp.person?.emoji||"👤")+' '+esc(tp.person?.kind==="pet"?"Mascota":"Viajero")+'</label><input data-tp="'+tp.person_id+'" value="'+esc(tp.display_name)+'"></div>').join('');openModal('<h2>👥 Nombres del viaje</h2><div class="formgrid">'+rows+'</div><div class="hint">Estos nombres solo afectan a este viaje. Los valores predeterminados siguen siendo Viajero 1, Viajero 2, Gato y Perro.</div><div class="toolbar"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar</button></div>');$("cancel").onclick=closeModal;$("save").onclick=async()=>{for(const el of document.querySelectorAll("[data-tp]")){const n=el.value.trim()||"Viajero";await api("bloomtrip_trip_people?trip_id=eq."+currentTrip.id+"&person_id=eq."+el.dataset.tp,{method:"PATCH",body:JSON.stringify({display_name:n})})}closeModal();await initTripPeople(currentTrip);renderProfiles();if(currentPerson){const np=tripPeople.find(x=>x.person_id===currentPerson.person_id);currentPerson=np;$("personTitle").textContent=(np.person?.emoji||"👤")+" "+np.display_name}}}
-$("addRunningBagBtn").onclick=()=>runningBagForm();$("newTripBtn").onclick=()=>tripForm();$("generalBtn").onclick=async()=>{$("home").classList.add("hidden");$("general").classList.remove("hidden");await renderGeneral()};$("generalBack").onclick=async()=>{$("general").classList.add("hidden");$("home").classList.remove("hidden");await renderTrips()};$("generalAdd").onclick=()=>itemForm(null,true);["gSearch","gCat","gType","gPhase"].forEach(id=>$(id).addEventListener("input",renderGeneral));$("backBtn").onclick=()=>{$("detail").classList.add("hidden");$("home").classList.remove("hidden");currentTrip=null;currentPerson=null;renderTrips()};$("backPeopleBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden")};$("bottomBackBtn").onclick=()=>{$("personDetail").classList.add("hidden");$("profiles").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};$("editTripBtn").onclick=()=>tripForm(currentTrip);$("peopleBtn").onclick=editTripPeople;$("addItemBtn").onclick=()=>itemForm();["search","cat","priority","status"].forEach(id=>$(id).addEventListener("input",renderItems));$("undoBtn").onclick=undoLast;
-renderTrips().catch(e=>alert("No se pudo conectar con BloomTrip.\n\n"+e.message));
-</script></body></html>
+$("now").onclick=()=>{let d=new Date();setTime(d.getHours()*60+d.getMinutes()+d.getSeconds()/60)}
+$("plus1").onclick=()=>add(1);$("plus5").onclick=()=>add(5);
+$("save").onclick=()=>{let t=read(),i=Number($("control").value);if(t==null){$("msg").className="status warn";$("msg").textContent="Revisa la hora: HH 00–23, MM y SS 00–59.";return}real[i]=t;$("msg").className="status ok";$("msg").textContent=`Paso guardado: ${zones[i][0]} · ${fmt(t)}`;renderTable();renderSummary()}
+$("clear").onclick=()=>{delete real[Number($("control").value)];$("msg").className="status";$("msg").textContent="Paso borrado.";renderTable();renderSummary()}
+$("simApply").onclick=renderSimulation;
+$("simReset").onclick=()=>{$("scenario").value="16";renderSimulation()};
+$("control").value="1";setTime(17*60);renderTable();renderSummary();renderSimulation();
+</script>
+</body></html>
