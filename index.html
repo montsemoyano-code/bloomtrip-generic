@@ -172,7 +172,8 @@ async function ensureTripAssignments(tripId){
       const pet=tp.person?.kind==='pet';
       let applies=false;
       if((g?.categoria||item.categoria)==='Mascota'){
-        if(!pet)continue;
+        const petModuleSelected=tripModuleIds.has(15);
+        if(!pet && !petModuleSelected)continue;
         const targets=(g?.pet_targets||[]).map(v=>String(v).toLowerCase());
         if(!targets.length)applies=true;else {const pname=String(tp.person?.name||'').toLowerCase();const kind=String(tp.person?.kind||'').toLowerCase();applies=targets.includes(pname)||targets.includes(kind)||(targets.includes('gato')&&targets.includes('perro')&&pname!=='gato'&&pname!=='perro');}
       } else if(pet){
@@ -228,7 +229,7 @@ async function addGeneralItemsToTrip(tripId,moduleIds,removeStale=true,includeBa
   const selectedIds=new Set(moduleIds.map(Number));
   const chosen=all.filter(gi=>{
     const links=byGeneral.get(gi.id)||[];
-    if(gi.categoria==="Mascota"&&!tripPeopleRows.some(tp=>tp.person?.kind==="pet"))return false;
+    if(gi.categoria==="Mascota"&&!selectedIds.has(15)&&!tripPeopleRows.some(tp=>tp.person?.kind==="pet"))return false;
     if(links.length&&!links.some(id=>selectedIds.has(Number(id))))return false;
     if(!links.length&&!includeBaseGeneral)return false;
     return true;
@@ -237,7 +238,7 @@ async function addGeneralItemsToTrip(tripId,moduleIds,removeStale=true,includeBa
   const stale=existing.filter(x=>x.general_item_id).filter(x=>{
     const gi=all.find(g=>g.id===x.general_item_id);if(!gi)return false;
     const links=byGeneral.get(gi.id)||[];
-    if(gi.categoria==="Mascota"&&!tripPeopleRows.some(tp=>tp.person?.kind==="pet"))return true;
+    if(gi.categoria==="Mascota"&&!selectedIds.has(15)&&!tripPeopleRows.some(tp=>tp.person?.kind==="pet"))return true;
     if(links.length&&!links.some(id=>selectedIds.has(Number(id))))return true;
     if(!links.length&&!includeBaseGeneral)return true;
     return false;
