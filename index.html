@@ -298,10 +298,11 @@ async function renderItems(){
   items=await api("bloomtrip_trip_items?select=*&trip_id=eq."+currentTrip.id);
   const links=await api("bloomtrip_trip_item_people?person_id=eq."+currentPerson.person_id+"&select=trip_item_id,person_id,done").catch(()=>[]);
   const itemIds=new Set(items.map(x=>x.id));
+  const generalIds=[...new Set(items.map(x=>Number(x.general_item_id)).filter(Boolean))];
   const linkMap=new Map(links.filter(x=>itemIds.has(x.trip_item_id)&&x.person_id===currentPerson.person_id).map(x=>[x.trip_item_id,x]));
   const [generals,glinks,personalModuleRows,tripCommonRows]=await Promise.all([
     api("bloomtrip_general_items?active=eq.true&select=id,categoria,pet_targets").catch(()=>[]),
-    (itemIds.size?api("bloomtrip_general_item_modules?general_item_id=in.("+[...itemIds].join(",")+")&select=general_item_id,module_id"):Promise.resolve([])).catch(()=>[]),
+    (generalIds.length?api("bloomtrip_general_item_modules?general_item_id=in.("+generalIds.join(",")+")&select=general_item_id,module_id"):Promise.resolve([])).catch(()=>[]),
     api("bloomtrip_trip_person_modules?trip_id=eq."+currentTrip.id+"&person_id=eq."+currentPerson.person_id+"&select=module_id").catch(()=>[]),
     api("bloomtrip_trip_modules?trip_id=eq."+currentTrip.id+"&select=module_id").catch(()=>[])
   ]);
