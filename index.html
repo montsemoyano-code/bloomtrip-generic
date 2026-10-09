@@ -191,7 +191,8 @@ async function ensureTripAssignments(tripId){
       const pet=tp.person?.kind==='pet';
       let applies=false;
       if((g?.categoria||item.categoria)==='Mascota'){
-        if(pet || tripModuleIds.has(15)) applies=true;
+        const petModuleId=Number(getPetModuleId()||15);
+        applies=pet && tripModuleIds.has(petModuleId);
       }else if(pet){
         applies=false;
       }else{
@@ -265,10 +266,12 @@ async function addGeneralItemsToTrip(tripId,moduleIds,removeStale=true,includeBa
   const existing=await api("bloomtrip_trip_items?trip_id=eq."+tripId+"&select=id,general_item_id").catch(()=>[]);
   const existingGeneral=new Set(existing.map(x=>x.general_item_id).filter(Boolean));
   const hasPetPeople=tripPeopleRows.some(tp=>tp.person?.kind==="pet");
+  const petModuleId=Number(getPetModuleId()||15);
+  const hasPetModule=selectedIds.has(petModuleId);
   const chosen=all.filter(gi=>{
     const allLinks=allByGeneral.get(Number(gi.id))||[];
     const selectedLinks=selectedByGeneral.get(Number(gi.id))||[];
-    if(gi.categoria==="Mascota") return selectedIds.has(15)||hasPetPeople;
+    if(gi.categoria==="Mascota") return hasPetModule&&hasPetPeople;
     if(allLinks.length) return selectedLinks.length>0;
     return includeBaseGeneral && selectedIds.has(BASE_MODULE_ID);
   });
@@ -313,23 +316,29 @@ async function renderItems(){
   const raceIdForPerson=Number(modules.find(m=>String(m.name||"").toLowerCase()==="carrera / competición")?.id||66);
   const hasRaceForPerson=activeModuleIds.has(raceIdForPerson);
   const baseAllowedForPerson=!hasRaceForPerson||!!currentTrip.include_stay_luggage;
+  const currentIsPet=personIsPet(currentPerson);
+  const petModuleId=Number(getPetModuleId()||15);
   const relevant=items.filter(x=>{
     if(!x.general_item_id) return linkMap.has(x.id)||legacyAppliesToPerson(x,currentPerson,gm.get(Number(x.general_item_id)));
     return linkMap.has(x.id);
-  }).map(x=>({...x,personDone:x.assignment_mode==="all"?x.done:!!linkMap.get(x.id)?.done,moduleIds:gmm.get(Number(x.general_item_id))||[]}));
+  }).map(x=>{
+    const allModuleIds=gmm.get(Number(x.general_item_id))||[];
+    const moduleIds=allModuleIds.filter(id=>activeModuleIds.has(Number(id))&&(currentIsPet||Number(id)!==petModuleId));
+    return {...x,personDone:x.assignment_mode==="all"?x.done:!!linkMap.get(x.id)?.done,moduleIds,allModuleIds};
+  }).filter(x=>!x.allModuleIds.length||x.moduleIds.length>0);
   const t=relevant.length,d=relevant.filter(x=>x.personDone).length,pc=t?Math.round(d/t*100):0;
   $("total").textContent=t;$("done").textContent=d;$("pending").textContent=t-d;$("pct").textContent=pc+"%";$('bar').style.width=pc+"%";
   const cats=[...new Set(relevant.map(x=>x.categoria).filter(Boolean))].sort(),pris=[...new Set(relevant.map(x=>x.prioridad).filter(Boolean))].sort();
+  // Mostrar únicamente módulos activos para este viaje/persona y que realmente tengan artículos asignados.
   const moduleSet=new Set(relevant.flatMap(x=>x.moduleIds||[]).map(Number));
-  personalModuleRows.forEach(r=>moduleSet.add(Number(r.module_id)));tripCommonRows.forEach(r=>moduleSet.add(Number(r.module_id)));climateIds.forEach(id=>moduleSet.add(Number(id)));
-  const mods=[...moduleSet].map(id=>modules.find(m=>Number(m.id)===Number(id))).filter(Boolean).sort((a,b)=>(a.sort_order??999)-(b.sort_order??999));
-  const hasBase=relevant.some(x=>(x.moduleIds||[]).length===0);
+  const mods=[...moduleSet].map(id=>modules.find(m=>Number(m.id)===Number(id))).filter(m=>m&& (currentIsPet || Number(m.id)!==petModuleId)).sort((a,b)=>(a.sort_order??999)-(b.sort_order??999));
+  const hasBase=relevant.some(x=>(x.allModuleIds||[]).length===0);
   $("cat").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option>'+esc(x)+'</option>').join('');
   $("moduleFilter").innerHTML='<option value="">Todos los módulos</option>'+(hasBase?'<option value="__base__">🧳 Básicos</option>':'')+mods.map(m=>'<option value="'+m.id+'">'+esc((m.emoji||'')+' '+m.name)+'</option>').join('');
   $("priority").innerHTML='<option value="">Todas las prioridades</option>'+pris.map(x=>'<option>'+esc(x)+'</option>').join('');
   if(cats.includes(prevCat))$("cat").value=prevCat;if(pris.includes(prevPriority))$("priority").value=prevPriority;if(prevModule==="__base__"&&hasBase)$("moduleFilter").value="__base__";else if(mods.some(m=>String(m.id)===prevModule))$("moduleFilter").value=prevModule;
   const q=$("search").value.toLowerCase(),c=$("cat").value,mf=$("moduleFilter").value,pr=$("priority").value,st=$("status").value;
-  const shown=relevant.filter(x=>(!q||((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase().includes(q))&&(!c||x.categoria===c)&&(!mf||(mf==='__base__'?(x.moduleIds||[]).length===0:(x.moduleIds||[]).includes(Number(mf))))&&(!pr||x.prioridad===pr)&&(!st||(st==="done")===x.personDone)).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
+  const shown=relevant.filter(x=>(!q||((x.articulo||"")+" "+(x.categoria||"")+" "+(x.subcategoria||"")+" "+(x.notas||"")).toLowerCase().includes(q))&&(!c||x.categoria===c)&&(!mf||(mf==='__base__'?(x.allModuleIds||[]).length===0:(x.moduleIds||[]).includes(Number(mf))))&&(!pr||x.prioridad===pr)&&(!st||(st==="done")===x.personDone)).sort((a,b)=>Number(a.personDone)-Number(b.personDone));
   $("list").innerHTML=shown.length?"":'<div class="empty">No hay artículos con estos filtros.</div>';
   shown.forEach(x=>{
     const row=document.createElement("div");
